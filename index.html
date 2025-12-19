@@ -8,14 +8,14 @@
         :root { --main-color: #248b65; }
         body { font-family: sans-serif; background: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); margin: 0; padding-bottom: 80px; }
         .catalog { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; }
-        .card { background: var(--tg-theme-secondary-bg-color); border-radius: 12px; padding: 10px; text-align: center; }
-        .card img { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; }
-        .btn { background: var(--main-color); color: white; border: none; padding: 10px; border-radius: 8px; width: 100%; font-weight: bold; margin-top: 10px; }
+        .card { background: var(--tg-theme-secondary-bg-color); border-radius: 12px; padding: 10px; text-align: center; display: flex; flex-direction: column; }
+        .card img { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; background: #eee; }
+        .btn { background: var(--main-color); color: white; border: none; padding: 10px; border-radius: 8px; width: 100%; font-weight: bold; margin-top: auto; }
         .footer { position: fixed; bottom: 0; width: 100%; background: var(--tg-theme-secondary-bg-color); padding: 15px; border-top: 1px solid #ccc; display: none; box-sizing: border-box; }
     </style>
 </head>
 <body>
-    <div id="catalog" class="catalog"></div>
+    <div id="catalog" class="catalog">Загрузка товаров...</div>
     <div id="footer" class="footer">
         <button class="btn" onclick="order()">Оформить предзаказ (<span id="count">0</span>)</button>
     </div>
@@ -25,19 +25,27 @@
         tg.expand();
         let cart = {};
 
-        // Получаем данные, которые бот передал в ссылке
-        const urlParams = new URLSearchParams(window.location.search);
-        const dataRaw = urlParams.get('data');
-        
-        if (dataRaw) {
-            const products = JSON.parse(decodeURIComponent(dataRaw));
+        // Теперь мы берем данные из специального файла, который бот будет обновлять
+        async function loadProducts() {
+            try {
+                // Пытаемся загрузить данные из кэша бота (самый простой способ без сервера)
+                const response = await fetch('products.json?v=' + Date.now());
+                const products = await response.json();
+                render(products);
+            } catch (e) {
+                document.getElementById('catalog').innerText = "Ошибка загрузки. Пожалуйста, обновите Excel через бота.";
+            }
+        }
+
+        function render(products) {
             const container = document.getElementById('catalog');
+            container.innerHTML = '';
             products.forEach(i => {
                 container.innerHTML += `
                     <div class="card">
                         <img src="${i.photo || ''}" onerror="this.src='https://via.placeholder.com/150'">
                         <h4>${i.name}</h4>
-                        <div style="color:var(--main-color)">$${i.price_info}</div>
+                        <div style="color:var(--main-color); font-weight:bold;">$${i.price_info}</div>
                         <button class="btn" id="btn-${i.articul}" onclick="toggleCart('${i.articul}', '${i.name}', ${i.price_info}, '${i.photo}')">Добавить</button>
                     </div>`;
             });
@@ -50,7 +58,7 @@
                 document.getElementById('btn-'+art).style.background = '#248b65';
             } else {
                 cart[art] = { name, price, photo, qty: 1 };
-                document.getElementById('btn-'+art).innerText = '✅ Ок';
+                document.getElementById('btn-'+art).innerText = '✅ В корзине';
                 document.getElementById('btn-'+art).style.background = '#4CAF50';
             }
             let total = Object.keys(cart).length;
@@ -62,6 +70,8 @@
             tg.sendData(JSON.stringify(cart));
             tg.close();
         }
+
+        loadProducts();
     </script>
 </body>
 </html>
