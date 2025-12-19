@@ -3,75 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scout Shoes Store</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --main-color: #248b65; }
-        body { font-family: sans-serif; background: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); margin: 0; padding-bottom: 80px; }
-        .catalog { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; }
-        .card { background: var(--tg-theme-secondary-bg-color); border-radius: 12px; padding: 10px; text-align: center; display: flex; flex-direction: column; }
-        .card img { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; background: #eee; }
-        .btn { background: var(--main-color); color: white; border: none; padding: 10px; border-radius: 8px; width: 100%; font-weight: bold; margin-top: auto; }
-        .footer { position: fixed; bottom: 0; width: 100%; background: var(--tg-theme-secondary-bg-color); padding: 15px; border-top: 1px solid #ccc; display: none; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 15px; }
+        
+        /* Стили для первого экрана выбора */
+        .category-selection { display: flex; flex-direction: column; gap: 20px; margin-top: 50px; }
+        .category-card { 
+            background: white; padding: 30px; border-radius: 15px; text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); font-size: 20px; font-weight: bold;
+            cursor: pointer; transition: transform 0.2s; border: 2px solid transparent;
+        }
+        .category-card:active { transform: scale(0.95); border-color: #0088cc; }
+        .category-card i { font-size: 40px; display: block; margin-bottom: 10px; }
+
+        /* Стили сетки товаров */
+        .grid { display: none; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .card { background: white; padding: 10px; border-radius: 10px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .card img { width: 100%; border-radius: 8px; height: 140px; object-fit: cover; }
+        .price-tag { color: #273c75; font-weight: bold; margin-top: 8px; font-size: 15px; }
+        .price-box { color: #2ecc71; font-size: 13px; margin-bottom: 5px; }
+        
+        .back-btn { 
+            display: none; background: #0088cc; color: white; padding: 10px; 
+            border-radius: 8px; text-align: center; margin-bottom: 15px; cursor: pointer; 
+        }
     </style>
 </head>
 <body>
-    <div id="catalog" class="catalog">Загрузка товаров...</div>
-    <div id="footer" class="footer">
-        <button class="btn" onclick="order()">Оформить предзаказ (<span id="count">0</span>)</button>
+    <div id="backBtn" class="back-btn" onclick="showCategories()">⬅ Назад к выбору</div>
+
+    <div id="categoryMenu" class="category-selection">
+        <div class="category-card" onclick="loadCatalog('male')">👟 Мужская обувь</div>
+        <div class="category-card" onclick="loadCatalog('female')">👠 Женская обувь</div>
     </div>
 
+    <div id="catalog" class="grid"></div>
+
     <script>
-        let tg = window.Telegram.WebApp;
+        const tg = window.Telegram.WebApp;
         tg.expand();
-        let cart = {};
+        let allProducts = [];
 
-        // Теперь мы берем данные из специального файла, который бот будет обновлять
-        async function loadProducts() {
+        async function preloadData() {
             try {
-                // Пытаемся загрузить данные из кэша бота (самый простой способ без сервера)
                 const response = await fetch('products.json?v=' + Date.now());
-                const products = await response.json();
-                render(products);
-            } catch (e) {
-                document.getElementById('catalog').innerText = "Ошибка загрузки. Пожалуйста, обновите Excel через бота.";
-            }
+                allProducts = await response.json();
+            } catch (e) { console.error("Ошибка загрузки данных"); }
         }
 
-        function render(products) {
+        function loadCatalog(category) {
             const container = document.getElementById('catalog');
+            const menu = document.getElementById('categoryMenu');
+            const backBtn = document.getElementById('backBtn');
+
+            // Фильтруем товары по колонке "category" из вашего Excel
+            const filtered = allProducts.filter(p => p.category === category);
+
             container.innerHTML = '';
-            products.forEach(i => {
-                container.innerHTML += `
-                    <div class="card">
-                        <img src="${i.photo || ''}" onerror="this.src='https://via.placeholder.com/150'">
-                        <h4>${i.name}</h4>
-                        <div style="color:var(--main-color); font-weight:bold;">$${i.price_info}</div>
-                        <button class="btn" id="btn-${i.articul}" onclick="toggleCart('${i.articul}', '${i.name}', ${i.price_info}, '${i.photo}')">Добавить</button>
-                    </div>`;
+            filtered.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.innerHTML = `
+                    <img src="${item.photo}" alt="">
+                    <div style="font-size: 12px; height: 32px; overflow: hidden; margin: 5px 0;">${item.name}</div>
+                    <div class="price-tag">${item.price} $ <span style="font-size: 10px; color: grey;">/ пара</span></div>
+                    <div class="price-box">Итого: ${item.price_info} $</div>
+                    <div style="font-size: 10px; color: #999;">Арт: ${item.articul}</div>
+                `;
+                container.appendChild(div);
             });
+
+            menu.style.display = 'none';
+            container.style.display = 'grid';
+            backBtn.style.display = 'block';
         }
 
-        function toggleCart(art, name, price, photo) {
-            if (cart[art]) {
-                delete cart[art];
-                document.getElementById('btn-'+art).innerText = 'Добавить';
-                document.getElementById('btn-'+art).style.background = '#248b65';
-            } else {
-                cart[art] = { name, price, photo, qty: 1 };
-                document.getElementById('btn-'+art).innerText = '✅ В корзине';
-                document.getElementById('btn-'+art).style.background = '#4CAF50';
-            }
-            let total = Object.keys(cart).length;
-            document.getElementById('footer').style.display = total > 0 ? 'block' : 'none';
-            document.getElementById('count').innerText = total;
+        function showCategories() {
+            document.getElementById('catalog').style.display = 'none';
+            document.getElementById('backBtn').style.display = 'none';
+            document.getElementById('categoryMenu').style.display = 'flex';
         }
 
-        function order() {
-            tg.sendData(JSON.stringify(cart));
-            tg.close();
-        }
-
-        loadProducts();
+        preloadData();
     </script>
 </body>
 </html>
