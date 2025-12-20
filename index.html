@@ -6,8 +6,8 @@
     <title>Scout Store</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --tg-theme-bg-color: #f0f2f5; --primary: #0088cc; }
-        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--tg-theme-bg-color); margin: 0; padding: 0; color: #333; }
+        :root { --tg-theme-bg-color: #f0f2f5; --primary: #0088cc; --text: #333; }
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--tg-theme-bg-color); margin: 0; padding: 0; color: var(--text); }
 
         /* ЭКРАН ЗАГРУЗКИ */
         #loader-screen {
@@ -16,19 +16,30 @@
             align-items: center; justify-content: center; z-index: 9999;
         }
         .spinner {
-            width: 50px; height: 50px; border: 5px solid #f3f3f3;
-            border-top: 5px solid var(--primary); border-radius: 50%;
-            animation: spin 1s linear infinite; margin-bottom: 20px;
+            width: 40px; height: 40px; border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary); border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 15px;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .loader-text { font-weight: bold; color: #7f8c8d; text-align: center; padding: 0 20px; }
 
         /* ОСНОВНОЙ КОНТЕНТ */
         #main-content { display: none; padding: 15px; }
-        .cat-card { background: white; padding: 30px; border-radius: 15px; margin-bottom: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer; }
+        
+        /* Кнопки категорий */
+        .cat-card { background: white; padding: 25px; border-radius: 15px; margin-bottom: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer; border: 1px solid #eee; }
+        .cat-card h2 { margin: 10px 0 0 0; font-size: 18px; color: var(--primary); }
+
+        /* Панель управления в каталоге */
+        .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; }
+        .sort-select { padding: 8px; border-radius: 8px; border: 1px solid #ccc; background: white; font-size: 14px; flex-grow: 1; outline: none; }
+
+        /* Сетка товаров */
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .item-card { background: white; padding: 10px; border-radius: 12px; text-align: center; }
-        .item-card img { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; }
+        .item-card { background: white; padding: 10px; border-radius: 12px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
+        .item-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 8px; margin-bottom: 8px; }
+        .item-price { color: #2ecc71; font-weight: 800; font-size: 16px; margin-bottom: 4px; }
+        .item-name { font-size: 12px; height: 32px; overflow: hidden; color: #555; }
+
         .nav { display: flex; align-items: center; margin-bottom: 15px; font-weight: bold; color: var(--primary); cursor: pointer; }
         .btn-order { background: var(--primary); color: white; border: none; width: 100%; padding: 15px; border-radius: 10px; font-size: 16px; font-weight: bold; margin-top: 20px; }
     </style>
@@ -37,76 +48,114 @@
 
     <div id="loader-screen">
         <div class="spinner"></div>
-        <div class="loader-text">
-            Синхронизация с базой данных...<br>
-            <span style="font-size: 12px; font-weight: normal;">Это может занять до 30 секунд при первом запуске.</span>
+        <div style="text-align: center; color: #7f8c8d;">
+            <b>Загрузка коллекции...</b><br>
+            <small>Синхронизация данных (до 30 сек)</small>
         </div>
     </div>
 
     <div id="main-content">
         <div id="screen-main">
-            <h1 style="text-align: center;">Scout Store</h1>
-            <div class="cat-card" onclick="showCatalog('male')"><span>👟</span><h2>Мужская обувь</h2></div>
-            <div class="cat-card" onclick="showCatalog('female')"><span>👠</span><h2>Женская обувь</h2></div>
+            <h1 style="text-align: center; margin-bottom: 25px;">SCOUT STORE</h1>
+            <div class="cat-card" onclick="openCatalog('male')"><span>👟</span><h2>МУЖСКАЯ ОБУВЬ</h2></div>
+            <div class="cat-card" onclick="openCatalog('female')"><span>👠</span><h2>ЖЕНСКАЯ ОБУВЬ</h2></div>
         </div>
 
         <div id="screen-catalog" style="display:none;">
-            <div class="nav" onclick="showMain()">⬅ К категориям</div>
+            <div class="nav" onclick="showMain()">⬅ Назад</div>
+            
+            <div class="controls">
+                <select id="sortPrice" class="sort-select" onchange="renderItems()">
+                    <option value="default">Сортировка: По умолчанию</option>
+                    <option value="low">Цена: Сначала дешевле</option>
+                    <option value="high">Цена: Сначала дороже</option>
+                </select>
+            </div>
+
             <div id="catalog-grid" class="grid"></div>
         </div>
 
         <div id="screen-product" style="display:none;">
-            <div class="nav" onclick="backToCatalog()">⬅ Назад в каталог</div>
-            <img id="p-img" style="width:100%; border-radius:15px;" src="">
-            <h2 id="p-name"></h2>
-            <p id="p-art" style="color:gray;"></p>
-            <div style="font-size:24px; font-weight:bold; color:#2ecc71;" id="p-price"></div>
-            <button class="btn-order" onclick="sendOrder()">➕ Добавить в предзаказ</button>
+            <div class="nav" onclick="backToCatalog()">⬅ В каталог</div>
+            <div style="background: white; padding: 15px; border-radius: 15px;">
+                <img id="p-img" style="width:100%; border-radius:10px;" src="">
+                <h2 id="p-name" style="margin: 15px 0 5px 0;"></h2>
+                <p id="p-art" style="color:gray; margin: 0; font-size: 14px;"></p>
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 26px; font-weight: 900; color: #2ecc71;" id="p-price"></span>
+                </div>
+                <button class="btn-order" onclick="sendOrder()">➕ Добавить в предзаказ</button>
+            </div>
         </div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        let products = [];
+        
+        let allProducts = [];
+        let currentCategory = '';
 
         async function init() {
             try {
-                // Добавляем параметр ?v= для обхода кэша
                 const res = await fetch('products.json?v=' + Date.now());
-                if (!res.ok) throw new Error("Ошибка загрузки");
-                products = await res.json();
-                
-                // Когда данные загружены — убираем лоадер
+                allProducts = await res.json();
                 document.getElementById('loader-screen').style.display = 'none';
                 document.getElementById('main-content').style.display = 'block';
             } catch (e) {
-                document.querySelector('.loader-text').innerText = "Ошибка загрузки данных. Попробуйте обновить.";
-                console.error(e);
+                console.error("Ошибка:", e);
             }
         }
 
-        function showCatalog(cat) {
+        function openCatalog(cat) {
+            currentCategory = cat;
+            document.getElementById('screen-main').style.display = 'none';
+            document.getElementById('screen-catalog').style.display = 'block';
+            renderItems();
+        }
+
+        function renderItems() {
             const grid = document.getElementById('catalog-grid');
+            const sortType = document.getElementById('sortPrice').value;
             grid.innerHTML = '';
-            products.filter(p => p.category === cat).forEach(p => {
+
+            // 1. Фильтруем по категории
+            let items = allProducts.filter(p => p.category === currentCategory);
+
+            // 2. Сортируем (используем price_info для оптовой цены)
+            if (sortType === 'low') {
+                items.sort((a, b) => parseFloat(a.price_info) - parseFloat(b.price_info));
+            } else if (sortType === 'high') {
+                items.sort((a, b) => parseFloat(b.price_info) - parseFloat(a.price_info));
+            }
+
+            // 3. Отображаем
+            items.forEach(p => {
                 const div = document.createElement('div');
                 div.className = 'item-card';
                 div.onclick = () => showProduct(p);
-                div.innerHTML = `<img src="${p.photo}"><div style="font-weight:bold; color:#2ecc71; margin:5px 0;">${p.price_info} $</div><div style="font-size:11px;">${p.name}</div>`;
+                div.innerHTML = `
+                    <img src="${p.photo}">
+                    <div class="item-price">${p.price_info} $</div>
+                    <div class="item-name">${p.name}</div>
+                `;
                 grid.appendChild(div);
             });
-            document.getElementById('screen-main').style.display = 'none';
-            document.getElementById('screen-catalog').style.display = 'block';
         }
 
         function showProduct(p) {
             document.getElementById('p-img').src = p.photo;
             document.getElementById('p-name').innerText = p.name;
-            document.getElementById('p-art').innerText = "Арт: " + p.articul;
+            document.getElementById('p-art').innerText = "Артикул: " + p.articul;
             document.getElementById('p-price').innerText = p.price_info + " $";
             document.getElementById('screen-catalog').style.display = 'none';
             document.getElementById('screen-product').style.display = 'block';
+        }
+
+        function sendOrder() {
+            // Тот же функционал заказа
+            tg.close();
         }
 
         function showMain() {
