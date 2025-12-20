@@ -22,14 +22,13 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* ОСНОВНОЙ КОНТЕНТ */
         #main-content { display: none; padding: 15px; }
         
-        /* Кнопки категорий */
+        /* Категории */
         .cat-card { background: white; padding: 25px; border-radius: 15px; margin-bottom: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer; border: 1px solid #eee; }
         .cat-card h2 { margin: 10px 0 0 0; font-size: 18px; color: var(--primary); }
 
-        /* Панель управления в каталоге */
+        /* Панель управления */
         .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; }
         .sort-select { padding: 8px; border-radius: 8px; border: 1px solid #ccc; background: white; font-size: 14px; flex-grow: 1; outline: none; }
 
@@ -37,11 +36,17 @@
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .item-card { background: white; padding: 10px; border-radius: 12px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
         .item-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 8px; margin-bottom: 8px; }
-        .item-price { color: #2ecc71; font-weight: 800; font-size: 16px; margin-bottom: 4px; }
+        .item-pair-price { color: #2ecc71; font-weight: 800; font-size: 16px; margin-bottom: 4px; }
         .item-name { font-size: 12px; height: 32px; overflow: hidden; color: #555; }
 
         .nav { display: flex; align-items: center; margin-bottom: 15px; font-weight: bold; color: var(--primary); cursor: pointer; }
         .btn-order { background: var(--primary); color: white; border: none; width: 100%; padding: 15px; border-radius: 10px; font-size: 16px; font-weight: bold; margin-top: 20px; }
+
+        /* Карточка товара */
+        .product-box { background: white; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .price-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 15px; }
+        .price-pair-big { font-size: 26px; font-weight: 900; color: #2ecc71; }
+        .price-box-total { font-size: 14px; color: #7f8c8d; text-align: right; line-height: 1.2; }
     </style>
 </head>
 <body>
@@ -50,7 +55,7 @@
         <div class="spinner"></div>
         <div style="text-align: center; color: #7f8c8d;">
             <b>Загрузка коллекции...</b><br>
-            <small>Синхронизация данных (до 30 сек)</small>
+            <small>Синхронизация (до 30 сек)</small>
         </div>
     </div>
 
@@ -63,7 +68,6 @@
 
         <div id="screen-catalog" style="display:none;">
             <div class="nav" onclick="showMain()">⬅ Назад</div>
-            
             <div class="controls">
                 <select id="sortPrice" class="sort-select" onchange="renderItems()">
                     <option value="default">Сортировка: По умолчанию</option>
@@ -71,20 +75,28 @@
                     <option value="high">Цена: Сначала дороже</option>
                 </select>
             </div>
-
             <div id="catalog-grid" class="grid"></div>
         </div>
 
         <div id="screen-product" style="display:none;">
             <div class="nav" onclick="backToCatalog()">⬅ В каталог</div>
-            <div style="background: white; padding: 15px; border-radius: 15px;">
+            <div class="product-box">
                 <img id="p-img" style="width:100%; border-radius:10px;" src="">
                 <h2 id="p-name" style="margin: 15px 0 5px 0;"></h2>
                 <p id="p-art" style="color:gray; margin: 0; font-size: 14px;"></p>
                 <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 26px; font-weight: 900; color: #2ecc71;" id="p-price"></span>
+                
+                <div class="price-row">
+                    <div>
+                        <div style="font-size: 12px; color: #7f8c8d;">Цена за пару:</div>
+                        <div class="price-pair-big" id="p-price-pair"></div>
+                    </div>
+                    <div class="price-box-total">
+                        За ящик (6 пар):<br>
+                        <b style="color: #333; font-size: 18px;" id="p-price-box"></b>
+                    </div>
                 </div>
+
                 <button class="btn-order" onclick="sendOrder()">➕ Добавить в предзаказ</button>
             </div>
         </div>
@@ -96,6 +108,7 @@
         
         let allProducts = [];
         let currentCategory = '';
+        let currentProduct = null;
 
         async function init() {
             try {
@@ -103,9 +116,7 @@
                 allProducts = await res.json();
                 document.getElementById('loader-screen').style.display = 'none';
                 document.getElementById('main-content').style.display = 'block';
-            } catch (e) {
-                console.error("Ошибка:", e);
-            }
+            } catch (e) { console.error(e); }
         }
 
         function openCatalog(cat) {
@@ -120,24 +131,21 @@
             const sortType = document.getElementById('sortPrice').value;
             grid.innerHTML = '';
 
-            // 1. Фильтруем по категории
             let items = allProducts.filter(p => p.category === currentCategory);
 
-            // 2. Сортируем (используем price_info для оптовой цены)
             if (sortType === 'low') {
-                items.sort((a, b) => parseFloat(a.price_info) - parseFloat(b.price_info));
+                items.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
             } else if (sortType === 'high') {
-                items.sort((a, b) => parseFloat(b.price_info) - parseFloat(a.price_info));
+                items.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
             }
 
-            // 3. Отображаем
             items.forEach(p => {
                 const div = document.createElement('div');
                 div.className = 'item-card';
                 div.onclick = () => showProduct(p);
                 div.innerHTML = `
                     <img src="${p.photo}">
-                    <div class="item-price">${p.price_info} $</div>
+                    <div class="item-pair-price">$ ${parseFloat(p.price).toFixed(2)}</div>
                     <div class="item-name">${p.name}</div>
                 `;
                 grid.appendChild(div);
@@ -145,17 +153,25 @@
         }
 
         function showProduct(p) {
+            currentProduct = p;
+            const pricePair = parseFloat(p.price);
+            const priceBox = pricePair * 6;
+
             document.getElementById('p-img').src = p.photo;
             document.getElementById('p-name').innerText = p.name;
             document.getElementById('p-art').innerText = "Артикул: " + p.articul;
-            document.getElementById('p-price').innerText = p.price_info + " $";
+            
+            document.getElementById('p-price-pair').innerText = `$ ${pricePair.toFixed(2)}`;
+            document.getElementById('p-price-box').innerText = `$ ${priceBox.toFixed(2)}`;
+
             document.getElementById('screen-catalog').style.display = 'none';
             document.getElementById('screen-product').style.display = 'block';
         }
 
         function sendOrder() {
-            // Тот же функционал заказа
-            tg.close();
+            const pricePair = parseFloat(currentProduct.price);
+            const text = `Заказ: ${currentProduct.name}\nАртикул: ${currentProduct.articul}\nЦена за пару: $${pricePair.toFixed(2)}\nИтого за ящик: $${(pricePair * 6).toFixed(2)}`;
+            tg.sendData(text);
         }
 
         function showMain() {
