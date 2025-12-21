@@ -3,92 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>SCOUT STORE</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root {
-            --tg-theme-bg-color: #ffffff;
-            --tg-theme-secondary-bg-color: #f4f4f7;
-            --tg-theme-button-color: #3390ec;
-            --tg-theme-text-color: #222222;
-        }
+        body { font-family: sans-serif; background: #f4f4f7; margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
+        /* 1 ЭКРАН - КАТЕГОРИИ (КАК БЫЛО) */
+        header { background: #fff; padding: 10px; display: flex; gap: 8px; overflow-x: auto; border-bottom: 1px solid #eee; }
+        .cat-btn { background: #eee; border: none; padding: 8px 15px; border-radius: 15px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+        .cat-btn.active { background: #3390ec; color: #fff; }
 
-        * { box-sizing: border-box; }
-        body {
-            font-family: -apple-system, sans-serif;
-            background-color: var(--tg-theme-secondary-bg-color);
-            color: var(--tg-theme-text-color);
-            margin: 0; padding: 0;
-            display: flex; flex-direction: column; height: 100vh;
-        }
-
-        /* ВОЗВРАЩАЕМ 1 ЭКРАН (ШАПКА КАТЕГОРИЙ) */
-        header {
-            background: var(--tg-theme-bg-color);
-            padding: 10px;
-            display: flex; gap: 8px;
-            overflow-x: auto;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-        header::-webkit-scrollbar { display: none; }
-        .cat-btn {
-            background: #eee; border: none; padding: 8px 15px;
-            border-radius: 15px; font-size: 13px; font-weight: 600;
-        }
-        .cat-btn.active { background: var(--tg-theme-button-color); color: white; }
-
-        /* СЕТКА ТОВАРОВ (2 ЭКРАН) */
-        #product-grid {
-            display: grid; grid-template-columns: 1fr 1fr;
-            gap: 10px; padding: 10px; overflow-y: auto; padding-bottom: 100px;
-        }
-        .product-card {
-            background: #fff; border-radius: 12px; padding: 10px;
-            display: flex; flex-direction: column;
-        }
+        /* 2 ЭКРАН - СЕТКА */
+        #product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; overflow-y: auto; padding-bottom: 80px; }
+        .product-card { background: #fff; border-radius: 10px; padding: 10px; display: flex; flex-direction: column; }
         .product-card img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; }
-        .product-name { font-size: 14px; font-weight: 600; margin: 8px 0 4px; height: 34px; overflow: hidden; }
-        .product-art { font-size: 11px; color: #777; line-height: 1.4; }
+        .product-name { font-size: 13px; font-weight: 600; margin: 5px 0; height: 32px; overflow: hidden; }
         
-        /* СТАТИСТИКА С НОВОЙ СТРОКИ */
-        .ord-badge { display: block; color: var(--tg-theme-button-color); font-weight: bold; margin-top: 2px; }
-        .product-price { font-size: 16px; font-weight: 800; margin-top: 5px; }
+        /* АРТИКУЛ И ЗАКАЗЫ С НОВОЙ СТРОКИ */
+        .product-art { font-size: 11px; color: #888; display: block; }
+        .ord-badge { display: block; color: #3390ec; font-weight: bold; margin-top: 2px; }
+        .product-price { font-size: 15px; font-weight: 800; margin-top: 5px; }
 
-        /* КОМПАКТНЫЙ 3 ЭКРАН (КАРТОЧКА) */
-        #product-detail {
-            display: none; position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: #fff; z-index: 100; padding: 12px; overflow-y: auto;
-        }
-        .back-btn { background: #eee; border: none; padding: 6px 12px; border-radius: 8px; margin-bottom: 8px; font-size: 12px; }
+        /* 3 ЭКРАН - МАКСИМАЛЬНО КОМПАКТНЫЙ */
+        #product-detail { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #fff; z-index: 100; padding: 10px; overflow-y: auto; }
+        .back-btn { background: #eee; border: none; padding: 5px 12px; border-radius: 8px; margin-bottom: 5px; font-size: 12px; }
         
-        .detail-img { 
-            display: block; width: auto; max-width: 100%; 
-            max-height: 200px; /* Сильно уменьшил фото */
-            margin: 0 auto 10px; border-radius: 10px; 
-        }
+        /* ФОТО ТЕПЕРЬ МАЛЕНЬКОЕ */
+        .detail-img { display: block; height: 160px; width: auto; margin: 0 auto 10px; border-radius: 8px; }
         
-        .stats-box {
-            background: #f4f7f9; padding: 8px; border-radius: 8px; 
-            margin-bottom: 10px; font-size: 12px;
-        }
-        .view-now { color: #d32f2f; font-weight: 600; margin-top: 2px; }
+        .stats-box { background: #f0f4f7; padding: 6px 10px; border-radius: 8px; margin-bottom: 8px; font-size: 11px; }
+        .view-now { color: #d32f2f; font-weight: bold; }
 
-        .price-info { border-top: 1px solid #eee; padding-top: 8px; margin-bottom: 10px; }
-        .p-main { font-size: 20px; font-weight: 900; color: #000; }
-        .p-sub { font-size: 12px; color: #777; }
+        .price-info { border-top: 1px dotted #ccc; padding-top: 5px; }
+        .p-main { font-size: 18px; font-weight: 900; }
+        .p-sub { font-size: 11px; color: #666; }
 
-        .add-btn {
-            background: var(--tg-theme-button-color); color: white;
-            border: none; width: 100%; padding: 12px;
-            border-radius: 10px; font-size: 15px; font-weight: bold;
-        }
-
-        .cart-bar {
-            position: fixed; bottom: 15px; left: 10px; right: 10px;
-            background: var(--tg-theme-button-color); color: white;
-            padding: 14px; border-radius: 12px; text-align: center; font-weight: bold;
-        }
+        .add-btn { background: #3390ec; color: #fff; border: none; width: 100%; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: bold; margin-top: 8px; }
+        .cart-bar { position: fixed; bottom: 15px; left: 10px; right: 10px; background: #3390ec; color: #fff; padding: 12px; border-radius: 10px; text-align: center; font-weight: bold; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -99,25 +49,24 @@
 <div id="product-detail">
     <button class="back-btn" onclick="closeDetail()">← Назад</button>
     <img id="detail-img" src="">
-    <h3 id="detail-name" style="margin: 0; font-size: 15px;"></h3>
-    <div id="detail-art" style="font-size: 11px; color: #888; margin-bottom: 8px;"></div>
+    <h3 id="detail-name" style="margin: 0; font-size: 14px;"></h3>
+    <div id="detail-art" style="font-size: 11px; color: #888;"></div>
 
     <div class="stats-box">
-        <div id="detail-ordered" style="font-weight: bold;"></div>
-        <div class="view-now">👁 Эту модель смотрят <span id="view-count"></span> чел.</div>
+        <div id="detail-ordered"></div>
+        <div class="viewing-now">👁 Эту модель смотрят <span id="view-count"></span> чел.</div>
     </div>
 
     <div class="price-info">
         <div id="detail-price-total" class="p-main"></div>
         <div id="detail-price-single" class="p-sub"></div>
-        <div style="font-size: 10px; color: #aaa;">Минимум: 1 короб (6 пар)</div>
     </div>
 
     <button class="add-btn" id="add-to-cart">Добавить в корзину</button>
 </div>
 
 <div class="cart-bar" id="cart-bar" style="display: none;" onclick="sendOrder()">
-    ОФОРМИТЬ ПРЕДЗАКАЗ: $<span id="cart-total">0</span>
+    ЗАКАЗАТЬ: $<span id="cart-total">0</span>
 </div>
 
 <script>
@@ -125,7 +74,8 @@
     tg.expand();
     let allProducts = [], cart = [];
 
-    fetch('products.json?v=' + Date.now())
+    // Добавили случайное число в конец ссылки, чтобы Telegram НЕ брал старую версию из памяти
+    fetch('products.json?v=' + Math.random())
         .then(r => r.json())
         .then(data => {
             allProducts = data;
@@ -169,21 +119,19 @@
         document.getElementById('detail-name').innerText = p.name;
         document.getElementById('detail-art').innerText = 'Артикул: ' + p.articul;
         document.getElementById('detail-price-single').innerText = `Цена за пару: $${price.toFixed(2)}`;
-        document.getElementById('detail-price-total').innerText = `Короб: $${(price * 6).toFixed(2)}`;
-        document.getElementById('detail-ordered').innerText = `🔥 Заказано всего: ${p.ordered_count || 0} раз`;
-        document.getElementById('view-count').innerText = p.viewing_now || Math.floor(Math.random() * 3) + 2;
+        document.getElementById('detail-price-total').innerText = `Короб (6 пар): $${(price * 6).toFixed(2)}`;
+        document.getElementById('detail-ordered').innerText = `Заказано всего: ${p.ordered_count || 0} раз`;
+        document.getElementById('view-count').innerText = p.viewing_now || Math.floor(Math.random() * 3) + 4;
         document.getElementById('product-detail').style.display = 'block';
         document.getElementById('add-to-cart').onclick = () => { cart.push(p); updateCart(); closeDetail(); };
     }
 
     function closeDetail() { document.getElementById('product-detail').style.display = 'none'; }
-
     function updateCart() {
         const total = cart.reduce((sum, p) => sum + (p.price * 6), 0);
         document.getElementById('cart-total').innerText = total.toFixed(2);
         document.getElementById('cart-bar').style.display = 'block';
     }
-
     function sendOrder() {
         tg.sendData(JSON.stringify({ items: cart, total: cart.reduce((sum, p) => sum + (p.price * 6), 0) }));
         tg.close();
