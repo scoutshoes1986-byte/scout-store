@@ -25,8 +25,13 @@
         .item-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 8px; }
         .selected-mark { position: absolute; top: 5px; right: 5px; background: var(--success); color: white; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 12px; border: 2px solid white; }
 
-        /* Статистика заказов */
+        /* Статистика на 2 экране */
         .order-count { display: block; color: var(--primary); font-size: 11px; font-weight: bold; margin-top: 2px; }
+
+        /* Статистика на 3 экране */
+        .stats-container { background: #f9f9f9; padding: 10px; border-radius: 10px; margin-top: 15px; border-left: 4px solid var(--primary); }
+        .stat-line { font-size: 14px; margin-bottom: 5px; }
+        .viewers-line { color: #e74c3c; font-weight: bold; font-size: 13px; }
 
         /* Кнопки */
         .btn { border: none; padding: 15px; border-radius: 10px; font-weight: bold; width: 100%; cursor: pointer; font-size: 16px; margin-top: 10px; }
@@ -66,8 +71,14 @@
         <div id="screen-product" style="display:none;">
             <div class="nav" onclick="backToCatalog()">⬅ В каталог</div>
             <img id="p-img" style="width:100%; border-radius:15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-            <h2 id="p-name" style="margin-top:15px;"></h2>
-            <p id="p-art" style="color:gray;"></p>
+            <h2 id="p-name" style="margin-top:15px; margin-bottom:5px;"></h2>
+            <p id="p-art" style="color:gray; margin:0;"></p>
+            
+            <div class="stats-container">
+                <div id="p-ordered-stat" class="stat-line"></div>
+                <div id="p-viewers" class="viewers-line"></div>
+            </div>
+
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
                 <div><small>За пару:</small><div id="p-price" style="font-size:24px; color:var(--success); font-weight:bold;"></div></div>
                 <div id="p-box" style="text-align:right; color:gray; font-size:14px;"></div>
@@ -144,6 +155,11 @@
             document.getElementById('p-price').innerText = `$ ${parseFloat(p.price).toFixed(2)}`;
             document.getElementById('p-box').innerText = `За ящик (6 пар):\n$ ${(p.price * 6).toFixed(2)}`;
             
+            // Статистика на 3 экране
+            document.getElementById('p-ordered-stat').innerText = `🔥 Заказано ${p.ordered_count || 0} раз`;
+            const randomViewers = Math.floor(Math.random() * 5) + 3; // Случайное число 3-7
+            document.getElementById('p-viewers').innerText = `👁 Эту модель смотрят прямо сейчас ${randomViewers} человека`;
+
             const inCart = cart.some(item => item.articul === p.articul);
             const btn = document.getElementById('add-btn');
             if(inCart) {
