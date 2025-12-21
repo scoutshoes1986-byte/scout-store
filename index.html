@@ -8,44 +8,33 @@
     <style>
         :root { --tg-theme-bg-color: #f0f2f5; --primary: #0088cc; --success: #2ecc71; }
         body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--tg-theme-bg-color); margin: 0; padding: 0; -webkit-user-select: none; }
-
-        /* Загрузка */
         #loader-screen { position: fixed; top:0; left:0; width:100%; height:100%; background:white; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999; }
         .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* Иконка корзины */
         #cart-badge { position: fixed; bottom: 20px; right: 20px; background: var(--primary); color: white; width: 60px; height: 60px; border-radius: 50%; display: none; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 1000; font-size: 24px; cursor: pointer; }
         #cart-count { position: absolute; top: 0; right: 0; background: red; color: white; border-radius: 50%; padding: 2px 6px; font-size: 12px; border: 2px solid white; }
-
-        /* Интерфейс */
         #main-content { padding: 15px; display:none; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .item-card { background: white; padding: 10px; border-radius: 12px; position: relative; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .item-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 8px; }
         .selected-mark { position: absolute; top: 5px; right: 5px; background: var(--success); color: white; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 12px; border: 2px solid white; }
-
-        /* Кнопки */
         .btn { border: none; padding: 15px; border-radius: 10px; font-weight: bold; width: 100%; cursor: pointer; font-size: 16px; margin-top: 10px; }
         .btn-add { background: var(--primary); color: white; }
         .btn-confirm { background: var(--success); color: white; margin-top: 20px; }
         .btn-disabled { background: #ccc !important; color: #666; cursor: default; }
-        
         #screen-cart { display: none; padding: 15px; background: #fff; min-height: 100vh; position: fixed; top: 0; left: 0; width: 100%; box-sizing: border-box; z-index: 2000; overflow-y: auto; }
         .cart-item { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #eee; padding: 10px 0; }
         .cart-item img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; }
-        
         .nav { color: var(--primary); font-weight: bold; cursor: pointer; margin-bottom: 15px; display: block; }
         .cat-card { background:white; padding:30px; border-radius:15px; margin-bottom:15px; text-align:center; border:1px solid #ddd; font-weight: bold; font-size: 18px; cursor: pointer; }
+        .sort-container { margin-bottom: 15px; display: flex; gap: 10px; justify-content: center; }
+        .sort-btn { padding: 8px 12px; border-radius: 20px; border: 1px solid var(--primary); background: white; color: var(--primary); font-size: 12px; cursor: pointer; }
+        .sort-btn.active { background: var(--primary); color: white; }
     </style>
 </head>
 <body>
 
-    <div id="loader-screen">
-        <div class="spinner"></div>
-        <p style="color:gray; margin-top:10px;">Загрузка...</p>
-    </div>
-
+    <div id="loader-screen"><div class="spinner"></div></div>
     <div id="cart-badge" onclick="showCart()">🛒<span id="cart-count">0</span></div>
 
     <div id="main-content">
@@ -56,7 +45,11 @@
         </div>
 
         <div id="screen-catalog" style="display:none;">
-            <div class="nav" onclick="showMain()">⬅ К категориям</div>
+            <div class="nav" onclick="showMain()">⬅ К выбору пола</div>
+            <div class="sort-container">
+                <button class="sort-btn active" id="sort-asc" onclick="setSort('asc')">Сначала дешевые</button>
+                <button class="sort-btn" id="sort-desc" onclick="setSort('desc')">Сначала дорогие</button>
+            </div>
             <div id="catalog-grid" class="grid"></div>
         </div>
 
@@ -65,12 +58,8 @@
             <img id="p-img" style="width:100%; border-radius:15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
             <h2 id="p-name" style="margin-top:15px; margin-bottom:5px;"></h2>
             <p id="p-art" style="color:gray; margin:0; font-size: 14px;"></p>
-            
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
-                <div>
-                    <small>Цена за пару:</small>
-                    <div id="p-price" style="font-size:24px; color:var(--success); font-weight:bold;"></div>
-                </div>
+                <div><small>Цена за пару:</small><div id="p-price" style="font-size:24px; color:var(--success); font-weight:bold;"></div></div>
                 <div id="p-box" style="text-align:right; color:gray; font-size:14px; white-space: pre-line;"></div>
             </div>
             <button class="btn btn-add" id="add-btn" onclick="addToCart()">➕ Добавить в предзаказ</button>
@@ -92,6 +81,7 @@
         let allProducts = [];
         let cart = JSON.parse(localStorage.getItem('scout_cart') || '[]');
         let currentCategory = '';
+        let currentSort = 'asc'; 
         let currentProduct = null;
 
         async function init() {
@@ -102,6 +92,13 @@
                 document.getElementById('main-content').style.display = 'block';
                 updateCartBadge();
             } catch (e) { alert("Ошибка: " + e.message); }
+        }
+
+        function setSort(type) {
+            currentSort = type;
+            document.getElementById('sort-asc').classList.toggle('active', type === 'asc');
+            document.getElementById('sort-desc').classList.toggle('active', type === 'desc');
+            renderItems();
         }
 
         function openCatalog(cat) {
@@ -125,13 +122,24 @@
         function renderItems() {
             const grid = document.getElementById('catalog-grid');
             grid.innerHTML = '';
-            const filtered = allProducts.filter(p => p.category === currentCategory);
+            
+            let filtered = allProducts.filter(p => p.category === currentCategory);
+            
+            filtered.sort((a, b) => {
+                return currentSort === 'asc' ? a.price - b.price : b.price - a.price;
+            });
+
             filtered.forEach(p => {
                 const inCart = cart.some(item => item.articul === p.articul);
                 const div = document.createElement('div');
                 div.className = 'item-card';
                 div.onclick = () => showProduct(p);
-                div.innerHTML = `${inCart ? '<div class="selected-mark">✓</div>' : ''}<img src="${p.photo}"><div style="font-weight:bold; margin-top:10px;">$ ${parseFloat(p.price).toFixed(2)}</div><div style="font-size:11px; color:gray; margin-top:4px;">${p.name}</div>`;
+                div.innerHTML = `
+                    ${inCart ? '<div class="selected-mark">✓</div>' : ''}
+                    <img src="${p.photo}">
+                    <div style="font-weight:bold; margin-top:10px;">$ ${parseFloat(p.price).toFixed(2)}</div>
+                    <div style="font-size:11px; color:gray; margin-top:4px;">${p.name}</div>
+                `;
                 grid.appendChild(div);
             });
         }
@@ -204,20 +212,16 @@
         function confirmOrder() {
             if (cart.length === 0) return;
             const total = cart.reduce((sum, item) => sum + (item.price * 6), 0);
-            
-            // Отправляем данные боту
             const orderData = { 
                 items: cart, 
-                total_text: "Итого 6 пар", 
-                total_sum: total.toFixed(2) 
+                label: "Итого 6 пар", 
+                total: total.toFixed(2) 
             };
             tg.sendData(JSON.stringify(orderData));
-            
             cart = [];
             localStorage.removeItem('scout_cart');
             tg.close();
         }
-
         init();
     </script>
 </body>
