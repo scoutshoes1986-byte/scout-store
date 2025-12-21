@@ -19,21 +19,26 @@
             color: var(--tg-theme-text-color);
             margin: 0; padding: 0;
             display: flex; flex-direction: column; height: 100vh;
+            overflow: hidden;
         }
 
+        /* ЧИСТАЯ ШАПКА */
         header {
             background: var(--tg-theme-bg-color);
-            padding: 15px 10px;
-            display: flex; gap: 10px;
+            padding: 10px;
+            display: flex; gap: 8px;
             overflow-x: auto;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            -webkit-overflow-scrolling: touch;
         }
+        header::-webkit-scrollbar { display: none; }
 
         .cat-btn {
             background: var(--tg-theme-secondary-bg-color);
-            border: none; padding: 8px 15px;
-            border-radius: 15px; font-size: 13px; font-weight: 600;
-            text-transform: uppercase;
+            border: none; padding: 7px 14px;
+            border-radius: 12px; font-size: 13px; font-weight: 600;
+            color: var(--tg-theme-text-color);
+            white-space: nowrap;
         }
 
         .cat-btn.active {
@@ -41,7 +46,7 @@
             color: white;
         }
 
-        /* 2 ЭКРАН: Витрина */
+        /* ГРИД ТОВАРОВ */
         #product-grid {
             display: grid; grid-template-columns: 1fr 1fr;
             gap: 10px; padding: 10px;
@@ -52,6 +57,7 @@
             background: var(--tg-theme-bg-color);
             border-radius: 12px; padding: 10px;
             display: flex; flex-direction: column;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         .product-card img {
@@ -61,24 +67,23 @@
 
         .product-name {
             font-size: 14px; font-weight: 600; margin: 8px 0 4px;
-            height: 36px; overflow: hidden;
+            height: 36px; overflow: hidden; line-height: 1.3;
         }
 
         .product-art {
-            font-size: 11px; color: #777;
+            font-size: 11px; color: #888; margin-bottom: 4px;
         }
 
-        /* ПОДСВЕТКА СТАТИСТИКИ НА 2 ЭКРАНЕ */
         .ordered-count {
             color: var(--tg-theme-button-color);
             font-weight: bold;
         }
 
         .product-price {
-            font-size: 16px; font-weight: 800; margin-top: 8px;
+            font-size: 16px; font-weight: 800; color: #000;
         }
 
-        /* 3 ЭКРАН: Карточка */
+        /* 3 ЭКРАН: ДЕТАЛИ */
         #product-detail {
             display: none; position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -86,37 +91,40 @@
             z-index: 100; padding: 20px; overflow-y: auto;
         }
 
+        .detail-img {
+            width: 100%; border-radius: 15px;
+            margin-bottom: 15px;
+        }
+
         .stats-container {
             background: var(--tg-theme-secondary-bg-color);
-            padding: 15px; border-radius: 12px; margin: 15px 0;
+            padding: 12px; border-radius: 10px; margin: 15px 0;
         }
 
-        .ordered-total {
-            font-weight: 700; font-size: 14px; margin-bottom: 5px;
-        }
+        .ordered-total { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+        .viewing-now { color: #d32f2f; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 5px; }
 
-        .viewing-now {
-            color: #d32f2f; font-weight: 600; font-size: 13px;
-            display: flex; align-items: center; gap: 5px;
-        }
+        .price-info { margin: 15px 0; }
+        .price-single { font-size: 18px; color: #666; }
+        .price-total { font-size: 24px; font-weight: 800; color: #000; margin-top: 5px; }
 
         .back-btn {
-            background: #eee; border: none; padding: 8px 15px;
-            border-radius: 8px; margin-bottom: 15px;
+            background: var(--tg-theme-secondary-bg-color); border: none; 
+            padding: 8px 15px; border-radius: 8px; margin-bottom: 15px; font-weight: 600;
         }
 
         .add-btn {
             background: var(--tg-theme-button-color);
             color: white; border: none; width: 100%;
             padding: 16px; border-radius: 12px;
-            font-size: 16px; font-weight: bold;
+            font-size: 16px; font-weight: bold; margin-top: 10px;
         }
 
         .cart-bar {
             position: fixed; bottom: 20px; left: 10px; right: 10px;
             background: var(--tg-theme-button-color); color: white;
             padding: 16px; border-radius: 15px; text-align: center;
-            font-weight: bold; z-index: 50;
+            font-weight: bold; z-index: 50; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
     </style>
 </head>
@@ -127,18 +135,23 @@
 
 <div id="product-detail">
     <button class="back-btn" onclick="closeDetail()">← Назад</button>
-    <img id="detail-img" src="" style="width: 100%; border-radius: 12px;">
-    <h2 id="detail-name"></h2>
-    <div id="detail-art" style="color: #777;"></div>
+    <img id="detail-img" src="" class="detail-img">
+    <h2 id="detail-name" style="margin: 0;"></h2>
+    <div id="detail-art" style="color: #888; margin-top: 5px;"></div>
 
     <div class="stats-container">
         <div id="detail-ordered" class="ordered-total"></div>
-        <div id="detail-viewing" class="viewing-now">
-            <span>👁</span> Эту модель смотрят прямо сейчас <span id="view-count"></span> чел.
+        <div class="viewing-now">
+            <span>👁</span> Эту модель смотрят сейчас <span id="view-count"></span> чел.
         </div>
     </div>
 
-    <h3 id="detail-price"></h3>
+    <div class="price-info">
+        <div id="detail-price-single" class="price-single"></div>
+        <div id="detail-price-total" class="price-total"></div>
+        <div style="font-size: 13px; color: #888;">В упаковке: 6 пар (одна ростовка)</div>
+    </div>
+
     <button class="add-btn" id="add-to-cart">Добавить в корзину</button>
 </div>
 
@@ -153,8 +166,7 @@
     let allProducts = [];
     let cart = [];
 
-    // Загрузка данных с защитой от кэша
-    fetch('products.json?nocache=' + Date.now())
+    fetch('products.json?v=' + Date.now())
         .then(r => r.json())
         .then(data => {
             allProducts = data;
@@ -165,7 +177,7 @@
     function renderCategories() {
         const cats = ['все', ...new Set(allProducts.map(p => p.category))];
         document.getElementById('categories').innerHTML = cats.map(c => `
-            <button class="cat-btn ${c === 'все' ? 'active' : ''}" onclick="filterCat(this, '${c}')">${c}</button>
+            <button class="cat-btn ${c === 'все' ? 'active' : ''}" onclick="filterCat(this, '${c}')">${c.toUpperCase()}</button>
         `).join('');
     }
 
@@ -180,14 +192,12 @@
         const filtered = cat === 'все' ? allProducts : allProducts.filter(p => p.category === cat);
         
         grid.innerHTML = filtered.map(p => {
-            // ВЫВОД НА 2 ЭКРАНЕ
-            const orderedInfo = p.ordered_count > 0 ? `<span class="ordered-count"> (Заказано ${p.ordered_count} раза)</span>` : '';
-            
+            const ordCount = p.ordered_count > 0 ? `<span class="ordered-count"> (Заказано ${p.ordered_count})</span>` : '';
             return `
                 <div class="product-card" onclick="openDetail('${p.articul}')">
                     <img src="${p.photo}">
                     <div class="product-name">${p.name}</div>
-                    <div class="product-art">Арт: ${p.articul}${orderedInfo}</div>
+                    <div class="product-art">Арт: ${p.articul}${ordCount}</div>
                     <div class="product-price">$ ${p.price}</div>
                 </div>
             `;
@@ -196,14 +206,20 @@
 
     function openDetail(art) {
         const p = allProducts.find(item => item.articul == art);
+        const price = parseFloat(p.price);
+        const boxPrice = price * 6;
+
         document.getElementById('detail-img').src = p.photo;
         document.getElementById('detail-name').innerText = p.name;
-        document.getElementById('detail-art').innerText = 'Артикул: ' + p.articul;
-        document.getElementById('detail-price').innerText = '$' + p.price + ' / пара';
+        document.getElementById('detail-art').innerText = 'Арт: ' + p.articul;
         
-        // ВЫВОД НА 3 ЭКРАНЕ
-        document.getElementById('detail-ordered').innerText = `Заказано за всё время: ${p.ordered_count || 0} раз`;
-        document.getElementById('view-count').innerText = p.viewing_now || Math.floor(Math.random() * 5) + 3;
+        // ЦЕНЫ
+        document.getElementById('detail-price-single').innerText = `Цена за пару: $${price.toFixed(2)}`;
+        document.getElementById('detail-price-total').innerText = `За ростовку: $${boxPrice.toFixed(2)}`;
+        
+        // СТАТИСТИКА
+        document.getElementById('detail-ordered').innerText = `🔥 Заказано за всё время: ${p.ordered_count || 0} раз`;
+        document.getElementById('view-count').innerText = p.viewing_now || Math.floor(Math.random() * 4) + 3;
 
         document.getElementById('product-detail').style.display = 'block';
         document.getElementById('add-to-cart').onclick = () => {
@@ -213,9 +229,7 @@
         };
     }
 
-    function closeDetail() {
-        document.getElementById('product-detail').style.display = 'none';
-    }
+    function closeDetail() { document.getElementById('product-detail').style.display = 'none'; }
 
     function updateCart() {
         const total = cart.reduce((sum, p) => sum + (p.price * 6), 0);
