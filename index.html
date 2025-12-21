@@ -6,220 +6,190 @@
     <title>SCOUT STORE</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root {
-            --tg-theme-bg-color: #fff;
-            --tg-theme-text-color: #000;
-            --tg-theme-button-color: #3390ec;
-            --tg-theme-button-text-color: #fff;
-            --tg-theme-hint-color: #707579;
-        }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--tg-theme-bg-color);
-            color: var(--tg-theme-text-color);
-            margin: 0; padding: 10px;
-            -webkit-user-select: none;
+            background-color: #f0f0f2;
+            margin: 0; padding: 10px; color: #000;
         }
-
-        .header {
-            text-align: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-            margin-bottom: 15px;
-        }
-
-        .product-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        .product-card {
-            background: #fff;
-            border-radius: 12px;
-            padding: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        /* ГЛАВНЫЙ ЭКРАН */
+        #main-menu {
             display: flex;
             flex-direction: column;
-            border: 1px solid #f0f0f0;
+            gap: 20px;
+            padding-top: 50px;
         }
-
-        .product-image {
-            width: 100%;
-            height: 120px;
-            object-fit: contain;
-            border-radius: 8px;
-            margin-bottom: 8px;
-        }
-
-        .product-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin: 5px 0;
-            height: 34px;
-            overflow: hidden;
-        }
-
-        .product-articul {
-            font-size: 11px;
-            color: var(--tg-theme-hint-color);
-            margin-bottom: 5px;
-        }
-
-        .product-price {
-            font-size: 16px;
-            font-weight: bold;
-            color: #1a5222;
-            margin-bottom: 10px;
-        }
-
-        /* Кнопки управления количеством */
-        .controls {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: auto;
-        }
-
-        .btn {
-            background: var(--tg-theme-button-color);
-            color: var(--tg-theme-button-text-color);
-            border: none;
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-weight: bold;
+        .category-btn {
+            background: #ffffff;
+            border: 2px solid #007aff;
+            border-radius: 20px;
+            padding: 40px 20px;
+            font-size: 22px;
+            font-weight: 800;
+            color: #007aff;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             cursor: pointer;
         }
+        .category-btn:active { transform: scale(0.98); }
 
+        /* КАТАЛОГ */
+        #catalog { display: none; }
+        .back-btn {
+            background: none; border: none; color: #007aff;
+            font-size: 16px; margin-bottom: 15px; cursor: pointer;
+        }
+        .item-card {
+            background: #ffffff; border-radius: 15px; padding: 15px;
+            margin-bottom: 20px; display: flex; flex-direction: column;
+            align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        .img { width: 100%; max-width: 300px; height: auto; border-radius: 10px; }
+        .title { font-size: 18px; font-weight: bold; margin: 15px 0 5px; text-align: center; }
+        .articul { color: #8e8e93; font-size: 14px; margin-bottom: 10px; }
+        .price { font-size: 22px; color: #248b1d; font-weight: 800; margin-bottom: 15px; }
+        
+        /* КНОПКИ */
+        .action-area { width: 100%; display: flex; justify-content: center; height: 50px; }
         .btn-add {
-            width: 100%;
+            width: 100%; background: #007aff; color: #fff; border: none;
+            border-radius: 10px; font-size: 16px; font-weight: 600;
         }
-
-        .counter-box {
-            display: none; /* Появляется, когда count > 0 */
-            width: 100%;
-            align-items: center;
-            justify-content: space-between;
+        .counter-group {
+            display: none; width: 100%; justify-content: space-between;
+            align-items: center; background: #f1f1f7; border-radius: 10px; padding: 0 5px;
         }
-
-        .count-val {
-            font-weight: bold;
-            font-size: 16px;
+        .btn-step {
+            width: 60px; height: 40px; background: #007aff; color: white;
+            border: none; border-radius: 8px; font-size: 24px;
+            display: flex; align-items: center; justify-content: center;
         }
-
-        .btn-mini {
-            width: 35px;
-            height: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
+        .count-num { font-size: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <strong>SCOUT STORE (ОПТ)</strong>
+<div id="main-menu">
+    <div class="category-btn" onclick="openCatalog('Мужская')">МУЖСКАЯ ОБУВЬ</div>
+    <div class="category-btn" onclick="openCatalog('Женская')">ЖЕНСКАЯ ОБУВЬ</div>
 </div>
 
-<div class="product-grid" id="grid">
-    <div style="grid-column: 1/-1; text-align: center;">Загрузка товаров...</div>
+<div id="catalog">
+    <button class="back-btn" onclick="showMenu()">← Назад к категориям</button>
+    <div id="products-list"></div>
 </div>
 
 <script>
     const tg = window.Telegram.WebApp;
     const MainButton = tg.MainButton;
-    let cart = {}; // { articul: { name, price, count, photo } }
+    let allProducts = [];
+    let cart = {};
 
-    async function loadProducts() {
+    // Загрузка данных при старте
+    async function init() {
         try {
-            const response = await fetch('products.json?v=' + Date.now());
-            const products = await response.json();
-            const grid = document.getElementById('grid');
-            grid.innerHTML = '';
-
-            products.forEach(p => {
-                const card = document.createElement('div');
-                card.className = 'product-card';
-                card.innerHTML = `
-                    <img src="${p.photo}" class="product-image">
-                    <div class="product-title">${p.name}</div>
-                    <div class="product-articul">Арт: ${p.articul}</div>
-                    <div class="product-price">$${p.price} <small>(за пару)</small></div>
-                    
-                    <div class="controls" id="controls-${p.articul}">
-                        <button class="btn btn-add" onclick="updateCount('${p.articul}', 1, '${p.name}', ${p.price}, '${p.photo}')">В КОРЗИНУ</button>
-                        <div class="counter-box" id="counter-${p.articul}">
-                            <button class="btn btn-mini" onclick="updateCount('${p.articul}', -1)">-</button>
-                            <span class="count-val" id="val-${p.articul}">0</span>
-                            <button class="btn btn-mini" onclick="updateCount('${p.articul}', 1)">+</button>
-                        </div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        } catch (e) {
-            document.getElementById('grid').innerHTML = "Ошибка загрузки: " + e;
-        }
+            const r = await fetch('products.json?v=' + Date.now());
+            allProducts = await r.json();
+        } catch (e) { console.error("Ошибка загрузки:", e); }
     }
 
-    function updateCount(art, delta, name, price, photo) {
-        if (!cart[art] && delta > 0) {
-            cart[art] = { name, price, count: 0, photo, articul: art };
+    function openCatalog(category) {
+        document.getElementById('main-menu').style.display = 'none';
+        document.getElementById('catalog').style.display = 'block';
+        renderProducts(category);
+        tg.expand();
+    }
+
+    function showMenu() {
+        document.getElementById('main-menu').style.display = 'flex';
+        document.getElementById('catalog').style.display = 'none';
+    }
+
+    function renderProducts(category) {
+        const list = document.getElementById('products-list');
+        list.innerHTML = '';
+        
+        // Фильтруем товары по категории (убедись, что в Excel в колонке category написано 'Мужская' или 'Женская')
+        const filtered = allProducts.filter(p => p.category === category);
+
+        if (filtered.length === 0) {
+            list.innerHTML = '<div style="text-align:center; padding:20px;">Товары в данной категории не найдены</div>';
+            return;
         }
 
+        filtered.forEach(p => {
+            const div = document.createElement('div');
+            div.className = 'item-card';
+            // Если товар уже в корзине, показываем счетчик, иначе - кнопку Добавить
+            const inCart = cart[p.articul];
+            
+            div.innerHTML = `
+                <img src="${p.photo}" class="img">
+                <div class="title">${p.name}</div>
+                <div class="articul">Арт: ${p.articul}</div>
+                <div class="price">$${p.price}</div>
+                
+                <div class="action-area">
+                    <button id="main-btn-${p.articul}" class="btn-add" 
+                        style="display: ${inCart ? 'none' : 'block'}"
+                        onclick="addToCart('${p.articul}', '${p.name}', ${p.price}, '${p.photo}')">
+                        Добавить в предзаказ
+                    </button>
+                    
+                    <div id="counter-${p.articul}" class="counter-group" style="display: ${inCart ? 'flex' : 'none'}">
+                        <button class="btn-step" onclick="updateQty('${p.articul}', -1)">-</button>
+                        <span class="count-num" id="val-${p.articul}">${inCart ? inCart.count : 1}</span>
+                        <button class="btn-step" onclick="updateQty('${p.articul}', 1)">+</button>
+                    </div>
+                </div>
+            `;
+            list.appendChild(div);
+        });
+    }
+
+    function addToCart(art, name, price, photo) {
+        cart[art] = { name, price, count: 1, photo, articul: art };
+        document.getElementById(`main-btn-${art}`).style.display = 'none';
+        document.getElementById(`counter-${art}`).style.display = 'flex';
+        document.getElementById(`val-${art}`).innerText = '1';
+        syncBot();
+    }
+
+    function updateQty(art, delta) {
         if (cart[art]) {
             cart[art].count += delta;
-            
-            // Визуальное переключение кнопок
-            const addBtn = document.querySelector(`#controls-${art} .btn-add`);
-            const counterBox = document.querySelector(`#counter-${art}`);
-            const valSpan = document.getElementById(`val-${art}`);
-
-            if (cart[art].count > 0) {
-                addBtn.style.display = 'none';
-                counterBox.style.display = 'flex';
-                valSpan.innerText = cart[art].count;
-            } else {
-                addBtn.style.display = 'block';
-                counterBox.style.display = 'none';
+            if (cart[art].count <= 0) {
                 delete cart[art];
+                document.getElementById(`main-btn-${art}`).style.display = 'block';
+                document.getElementById(`counter-${art}`).style.display = 'none';
+            } else {
+                document.getElementById(`val-${art}`).innerText = cart[art].count;
             }
         }
-        updateMainButton();
+        syncBot();
     }
 
-    function updateMainButton() {
+    function syncBot() {
         const items = Object.values(cart);
-        let totalCount = 0;
+        let totalBoxes = 0;
         let totalPrice = 0;
-
         items.forEach(i => {
-            totalCount += i.count;
+            totalBoxes += i.count;
             totalPrice += (i.price * 6 * i.count);
         });
 
-        if (totalCount > 0) {
-            MainButton.setText(`ОФОРМИТЬ: ${totalCount} кор. ($${totalPrice.toFixed(2)})`);
+        if (totalBoxes > 0) {
+            MainButton.setText(`ОФОРМИТЬ ${totalBoxes} КОР. ($${totalPrice.toFixed(2)})`);
             MainButton.show();
         } else {
             MainButton.hide();
         }
     }
 
-    tg.onEvent('mainButtonClicked', function() {
-        const data = {
-            items: Object.values(cart),
-            total: 0 // Бот пересчитает сам для точности
-        };
-        tg.sendData(JSON.stringify(data));
-        tg.close();
+    tg.onEvent('mainButtonClicked', () => {
+        tg.sendData(JSON.stringify({ items: Object.values(cart) }));
     });
 
-    tg.expand();
-    loadProducts();
+    init();
 </script>
 
 </body>
