@@ -14,111 +14,80 @@
         }
 
         * { box-sizing: border-box; }
-        
         body {
-            font-family: -apple-system, system-ui, sans-serif;
+            font-family: -apple-system, sans-serif;
             background-color: var(--tg-theme-secondary-bg-color);
             color: var(--tg-theme-text-color);
             margin: 0; padding: 0;
-            display: flex; flex-direction: column; 
-            height: 100vh; width: 100vw;
-            overflow: hidden;
+            display: flex; flex-direction: column; height: 100vh;
         }
 
-        /* Шапка с категориями */
+        /* ВОЗВРАЩАЕМ 1 ЭКРАН (ШАПКА КАТЕГОРИЙ) */
         header {
             background: var(--tg-theme-bg-color);
-            padding: 10px 10px 8px 10px;
+            padding: 10px;
             display: flex; gap: 8px;
             overflow-x: auto;
-            border-bottom: 1px solid #eee;
-            flex-shrink: 0;
-            -webkit-overflow-scrolling: touch;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
         header::-webkit-scrollbar { display: none; }
-
         .cat-btn {
-            background: #f0f0f0; border: none; 
-            padding: 6px 12px; border-radius: 10px;
-            font-size: 12px; font-weight: 600;
-            color: #555; white-space: nowrap;
+            background: #eee; border: none; padding: 8px 15px;
+            border-radius: 15px; font-size: 13px; font-weight: 600;
         }
-        .cat-btn.active {
-            background: var(--tg-theme-button-color);
-            color: white;
-        }
+        .cat-btn.active { background: var(--tg-theme-button-color); color: white; }
 
-        /* Сетка товаров */
+        /* СЕТКА ТОВАРОВ (2 ЭКРАН) */
         #product-grid {
-            flex-grow: 1;
-            display: grid; 
-            grid-template-columns: 1fr 1fr;
-            gap: 8px; padding: 10px 10px 100px 10px;
-            overflow-y: auto;
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 10px; padding: 10px; overflow-y: auto; padding-bottom: 100px;
         }
-
         .product-card {
-            background: #fff; border-radius: 10px;
-            padding: 8px; display: flex; flex-direction: column;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            background: #fff; border-radius: 12px; padding: 10px;
+            display: flex; flex-direction: column;
         }
-
-        .product-card img {
-            width: 100%; aspect-ratio: 1;
-            object-fit: cover; border-radius: 6px;
-        }
-
-        .product-name {
-            font-size: 13px; font-weight: 600; margin: 6px 0 2px;
-            height: 32px; overflow: hidden; line-height: 1.2;
-        }
-
-        .product-art { font-size: 10px; color: #888; }
+        .product-card img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; }
+        .product-name { font-size: 14px; font-weight: 600; margin: 8px 0 4px; height: 34px; overflow: hidden; }
+        .product-art { font-size: 11px; color: #777; line-height: 1.4; }
         
-        /* Статистика с новой строки */
-        .ordered-badge { 
-            display: block; /* Принудительный перенос */
-            color: var(--tg-theme-button-color); 
-            font-weight: 700; 
-            margin-top: 2px;
-        }
+        /* СТАТИСТИКА С НОВОЙ СТРОКИ */
+        .ord-badge { display: block; color: var(--tg-theme-button-color); font-weight: bold; margin-top: 2px; }
+        .product-price { font-size: 16px; font-weight: 800; margin-top: 5px; }
 
-        .product-price { font-size: 15px; font-weight: 800; margin-top: 4px; }
-
-        /* КОМПАКТНЫЙ 3 ЭКРАН */
+        /* КОМПАКТНЫЙ 3 ЭКРАН (КАРТОЧКА) */
         #product-detail {
             display: none; position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: #fff; z-index: 1000;
-            padding: 15px; overflow-y: auto;
+            background: #fff; z-index: 100; padding: 12px; overflow-y: auto;
         }
-
+        .back-btn { background: #eee; border: none; padding: 6px 12px; border-radius: 8px; margin-bottom: 8px; font-size: 12px; }
+        
         .detail-img { 
-            width: 100%; max-height: 250px; /* Ограничил высоту */
-            object-fit: contain; border-radius: 10px; 
-            margin-bottom: 10px; background: #f9f9f9;
+            display: block; width: auto; max-width: 100%; 
+            max-height: 200px; /* Сильно уменьшил фото */
+            margin: 0 auto 10px; border-radius: 10px; 
         }
         
         .stats-box {
-            background: #f4f7f9; padding: 8px 12px;
-            border-radius: 8px; margin: 10px 0;
-            font-size: 12px;
+            background: #f4f7f9; padding: 8px; border-radius: 8px; 
+            margin-bottom: 10px; font-size: 12px;
         }
         .view-now { color: #d32f2f; font-weight: 600; margin-top: 2px; }
 
-        .price-section { margin: 10px 0; padding-top: 10px; border-top: 1px solid #eee; }
-        .p-label { color: #777; font-size: 13px; }
-        .p-main { font-size: 22px; font-weight: 900; color: #000; }
+        .price-info { border-top: 1px solid #eee; padding-top: 8px; margin-bottom: 10px; }
+        .p-main { font-size: 20px; font-weight: 900; color: #000; }
+        .p-sub { font-size: 12px; color: #777; }
 
-        .back-btn { background: #f0f0f0; border: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; margin-bottom: 10px; }
-        .add-btn { background: var(--tg-theme-button-color); color: #fff; border: none; width: 100%; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 800; }
+        .add-btn {
+            background: var(--tg-theme-button-color); color: white;
+            border: none; width: 100%; padding: 12px;
+            border-radius: 10px; font-size: 15px; font-weight: bold;
+        }
 
-        /* Кнопка заказа внизу */
-        .cart-bar { 
-            position: fixed; bottom: 15px; left: 10px; right: 10px; 
-            background: var(--tg-theme-button-color); color: #fff; 
-            padding: 15px; border-radius: 12px; text-align: center; 
-            font-weight: 800; z-index: 500; font-size: 14px;
+        .cart-bar {
+            position: fixed; bottom: 15px; left: 10px; right: 10px;
+            background: var(--tg-theme-button-color); color: white;
+            padding: 14px; border-radius: 12px; text-align: center; font-weight: bold;
         }
     </style>
 </head>
@@ -129,19 +98,19 @@
 
 <div id="product-detail">
     <button class="back-btn" onclick="closeDetail()">← Назад</button>
-    <center><img id="detail-img" src=""></center>
-    <h3 id="detail-name" style="margin: 5px 0 0 0; font-size: 16px;"></h3>
-    <div id="detail-art" style="color: #999; font-size: 12px;"></div>
+    <img id="detail-img" src="">
+    <h3 id="detail-name" style="margin: 0; font-size: 15px;"></h3>
+    <div id="detail-art" style="font-size: 11px; color: #888; margin-bottom: 8px;"></div>
 
     <div class="stats-box">
         <div id="detail-ordered" style="font-weight: bold;"></div>
         <div class="view-now">👁 Эту модель смотрят <span id="view-count"></span> чел.</div>
     </div>
 
-    <div class="price-section">
-        <div id="detail-price-single" class="p-label"></div>
+    <div class="price-info">
         <div id="detail-price-total" class="p-main"></div>
-        <div style="font-size: 11px; color: #aaa;">Цена за коробку (6 пар)</div>
+        <div id="detail-price-single" class="p-sub"></div>
+        <div style="font-size: 10px; color: #aaa;">Минимум: 1 короб (6 пар)</div>
     </div>
 
     <button class="add-btn" id="add-to-cart">Добавить в корзину</button>
@@ -181,7 +150,7 @@
         const grid = document.getElementById('product-grid');
         const filtered = cat === 'все' ? allProducts : allProducts.filter(p => p.category === cat);
         grid.innerHTML = filtered.map(p => {
-            const ord = p.ordered_count > 0 ? `<span class="ordered-badge">Заказано ${p.ordered_count} раз</span>` : '';
+            const ord = p.ordered_count > 0 ? `<span class="ord-badge">Заказано ${p.ordered_count} раза</span>` : '';
             return `
                 <div class="product-card" onclick="openDetail('${p.articul}')">
                     <img src="${p.photo}">
@@ -201,7 +170,7 @@
         document.getElementById('detail-art').innerText = 'Артикул: ' + p.articul;
         document.getElementById('detail-price-single').innerText = `Цена за пару: $${price.toFixed(2)}`;
         document.getElementById('detail-price-total').innerText = `Короб: $${(price * 6).toFixed(2)}`;
-        document.getElementById('detail-ordered').innerText = `🔥 Купили ${p.ordered_count || 0} раз`;
+        document.getElementById('detail-ordered').innerText = `🔥 Заказано всего: ${p.ordered_count || 0} раз`;
         document.getElementById('view-count').innerText = p.viewing_now || Math.floor(Math.random() * 3) + 2;
         document.getElementById('product-detail').style.display = 'block';
         document.getElementById('add-to-cart').onclick = () => { cart.push(p); updateCart(); closeDetail(); };
