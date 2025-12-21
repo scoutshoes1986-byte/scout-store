@@ -9,49 +9,42 @@
         :root { --tg-theme-bg-color: #f0f2f5; --primary: #0088cc; --success: #2ecc71; }
         body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--tg-theme-bg-color); margin: 0; padding: 0; -webkit-user-select: none; }
 
-        /* Лоадер */
+        /* Loader */
         #loader-screen { position: fixed; top:0; left:0; width:100%; height:100%; background:white; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999; }
         .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Корзина (иконка) */
+        /* Floating Cart Badge */
         #cart-badge { position: fixed; bottom: 20px; right: 20px; background: var(--primary); color: white; width: 60px; height: 60px; border-radius: 50%; display: none; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 1000; font-size: 24px; cursor: pointer; }
         #cart-count { position: absolute; top: 0; right: 0; background: red; color: white; border-radius: 50%; padding: 2px 6px; font-size: 12px; border: 2px solid white; }
 
-        /* Сетка */
+        /* Main Layout */
         #main-content { padding: 15px; display:none; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .item-card { background: white; padding: 10px; border-radius: 12px; position: relative; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .item-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 8px; }
         .selected-mark { position: absolute; top: 5px; right: 5px; background: var(--success); color: white; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 12px; border: 2px solid white; }
 
-        /* Статистика на 2 экране */
-        .order-count { display: block; color: var(--primary); font-size: 11px; font-weight: bold; margin-top: 2px; }
-
-        /* Статистика на 3 экране */
-        .stats-container { background: #f9f9f9; padding: 10px; border-radius: 10px; margin-top: 15px; border-left: 4px solid var(--primary); }
-        .stat-line { font-size: 14px; margin-bottom: 5px; }
-        .viewers-line { color: #e74c3c; font-weight: bold; font-size: 13px; }
-
-        /* Кнопки */
+        /* Buttons */
         .btn { border: none; padding: 15px; border-radius: 10px; font-weight: bold; width: 100%; cursor: pointer; font-size: 16px; margin-top: 10px; }
         .btn-add { background: var(--primary); color: white; }
         .btn-confirm { background: var(--success); color: white; margin-top: 20px; }
         .btn-disabled { background: #ccc !important; color: #666; cursor: default; }
         
-        /* Экран корзины */
+        /* Screens */
         #screen-cart { display: none; padding: 15px; background: #fff; min-height: 100vh; position: fixed; top: 0; left: 0; width: 100%; box-sizing: border-box; z-index: 2000; overflow-y: auto; }
         .cart-item { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #eee; padding: 10px 0; }
         .cart-item img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; }
         
         .nav { color: var(--primary); font-weight: bold; cursor: pointer; margin-bottom: 15px; display: block; }
+        .cat-card { background:white; padding:30px; border-radius:15px; margin-bottom:15px; text-align:center; border:1px solid #ddd; font-weight: bold; font-size: 18px; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div id="loader-screen">
         <div class="spinner"></div>
-        <p style="color:gray; margin-top:10px;">Загрузка данных...</p>
+        <p style="color:gray; margin-top:10px;">Загрузка магазина...</p>
     </div>
 
     <div id="cart-badge" onclick="showCart()">🛒<span id="cart-count">0</span></div>
@@ -59,12 +52,12 @@
     <div id="main-content">
         <div id="screen-main">
             <h2 style="text-align:center;">SCOUT STORE</h2>
-            <div onclick="openCatalog('male')" style="background:white; padding:30px; border-radius:15px; margin-bottom:15px; text-align:center; border:1px solid #ddd;">👟 МУЖСКАЯ ОБУВЬ</div>
-            <div onclick="openCatalog('female')" style="background:white; padding:30px; border-radius:15px; text-align:center; border:1px solid #ddd;">👠 ЖЕНСКАЯ ОБУВЬ</div>
+            <div class="cat-card" onclick="openCatalog('male')">👟 МУЖСКАЯ ОБУВЬ</div>
+            <div class="cat-card" onclick="openCatalog('female')">👠 ЖЕНСКАЯ ОБУВЬ</div>
         </div>
 
         <div id="screen-catalog" style="display:none;">
-            <div class="nav" onclick="showMain()">⬅ Категории</div>
+            <div class="nav" onclick="showMain()">⬅ Назад к выбору пола</div>
             <div id="catalog-grid" class="grid"></div>
         </div>
 
@@ -72,16 +65,14 @@
             <div class="nav" onclick="backToCatalog()">⬅ В каталог</div>
             <img id="p-img" style="width:100%; border-radius:15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
             <h2 id="p-name" style="margin-top:15px; margin-bottom:5px;"></h2>
-            <p id="p-art" style="color:gray; margin:0;"></p>
+            <p id="p-art" style="color:gray; margin:0; font-size: 14px;"></p>
             
-            <div class="stats-container">
-                <div id="p-ordered-stat" class="stat-line"></div>
-                <div id="p-viewers" class="viewers-line"></div>
-            </div>
-
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
-                <div><small>За пару:</small><div id="p-price" style="font-size:24px; color:var(--success); font-weight:bold;"></div></div>
-                <div id="p-box" style="text-align:right; color:gray; font-size:14px;"></div>
+                <div>
+                    <small>Цена за пару:</small>
+                    <div id="p-price" style="font-size:24px; color:var(--success); font-weight:bold;"></div>
+                </div>
+                <div id="p-box" style="text-align:right; color:gray; font-size:14px; white-space: pre-line;"></div>
             </div>
             <button class="btn btn-add" id="add-btn" onclick="addToCart()">➕ Добавить в предзаказ</button>
         </div>
@@ -92,7 +83,7 @@
         <h3>Ваш предзаказ</h3>
         <div id="cart-items"></div>
         <div id="cart-total" style="margin-top:20px; font-weight:bold; font-size:20px; text-align:right; border-top: 2px solid #eee; padding-top:10px;"></div>
-        <button class="btn btn-confirm" onclick="confirmOrder()">✅ Подтвердить и получить PDF</button>
+        <button class="btn btn-confirm" onclick="confirmOrder()">✅ Подтвердить и отправить</button>
     </div>
 
     <script>
@@ -104,10 +95,11 @@
         let currentCategory = '';
         let currentProduct = null;
 
+        // Загрузка данных
         async function init() {
             try {
                 const res = await fetch('products.json?v=' + Date.now());
-                if (!res.ok) throw new Error("Файл базы не найден");
+                if (!res.ok) throw new Error("Файл не найден");
                 allProducts = await res.json();
                 
                 document.getElementById('loader-screen').style.display = 'none';
@@ -118,6 +110,7 @@
             }
         }
 
+        // Логика переходов
         function openCatalog(cat) {
             currentCategory = cat;
             document.getElementById('screen-main').style.display = 'none';
@@ -125,6 +118,18 @@
             renderItems();
         }
 
+        function showMain() {
+            document.getElementById('screen-catalog').style.display = 'none';
+            document.getElementById('screen-main').style.display = 'block';
+        }
+
+        function backToCatalog() {
+            document.getElementById('screen-product').style.display = 'none';
+            document.getElementById('screen-catalog').style.display = 'block';
+            renderItems();
+        }
+
+        // Рендер каталога
         function renderItems() {
             const grid = document.getElementById('catalog-grid');
             grid.innerHTML = '';
@@ -132,38 +137,33 @@
             
             filtered.forEach(p => {
                 const inCart = cart.some(item => item.articul === p.articul);
-                const orders = p.ordered_count ? `<span class="order-count">Заказано ${p.ordered_count} раз</span>` : '';
                 const div = document.createElement('div');
                 div.className = 'item-card';
                 div.onclick = () => showProduct(p);
                 div.innerHTML = `
                     ${inCart ? '<div class="selected-mark">✓</div>' : ''}
                     <img src="${p.photo}">
-                    <div style="font-weight:bold; margin-top:5px;">$ ${parseFloat(p.price).toFixed(2)}</div>
-                    ${orders}
-                    <div style="font-size:11px; color:gray; margin-top:2px;">${p.name}</div>
+                    <div style="font-weight:bold; margin-top:10px;">$ ${parseFloat(p.price).toFixed(2)}</div>
+                    <div style="font-size:11px; color:gray; margin-top:4px;">${p.name}</div>
                 `;
                 grid.appendChild(div);
             });
         }
 
+        // Карточка товара
         function showProduct(p) {
             currentProduct = p;
             document.getElementById('p-img').src = p.photo;
             document.getElementById('p-name').innerText = p.name;
-            document.getElementById('p-art').innerText = "Артикул: " + p.articul;
+            document.getElementById('p-art').innerText = "Арт: " + p.articul;
             document.getElementById('p-price').innerText = `$ ${parseFloat(p.price).toFixed(2)}`;
-            document.getElementById('p-box').innerText = `За ящик (6 пар):\n$ ${(p.price * 6).toFixed(2)}`;
+            document.getElementById('p-box').innerText = `Короб (6 пар):\n$ ${(p.price * 6).toFixed(2)}`;
             
-            // Статистика на 3 экране
-            document.getElementById('p-ordered-stat').innerText = `🔥 Заказано ${p.ordered_count || 0} раз`;
-            const randomViewers = Math.floor(Math.random() * 5) + 3; // Случайное число 3-7
-            document.getElementById('p-viewers').innerText = `👁 Эту модель смотрят прямо сейчас ${randomViewers} человека`;
-
             const inCart = cart.some(item => item.articul === p.articul);
             const btn = document.getElementById('add-btn');
+            
             if(inCart) {
-                btn.innerText = "✓ В предзаказе";
+                btn.innerText = "✓ Уже в предзаказе";
                 btn.classList.add('btn-disabled');
                 btn.onclick = null;
             } else {
@@ -176,6 +176,7 @@
             document.getElementById('screen-product').style.display = 'block';
         }
 
+        // Корзина
         function addToCart() {
             if (!currentProduct) return;
             cart.push(currentProduct);
@@ -201,7 +202,7 @@
             let total = 0;
             
             if (cart.length === 0) {
-                container.innerHTML = '<p style="text-align:center; color:gray;">Ваша корзина пуста</p>';
+                container.innerHTML = '<p style="text-align:center; color:gray; margin-top:30px;">Корзина пока пуста</p>';
                 document.getElementById('cart-total').innerText = '';
             } else {
                 cart.forEach((item, index) => {
@@ -214,7 +215,7 @@
                                 <div style="font-weight:bold; font-size:14px;">${item.name}</div>
                                 <div style="font-size:12px; color:gray;">Арт: ${item.articul} | $ ${priceBox.toFixed(2)}</div>
                             </div>
-                            <div style="color:red; font-size:12px;" onclick="removeFromCart(${index})">Удалить</div>
+                            <div style="color:red; font-size:12px; font-weight:bold;" onclick="removeFromCart(${index})">Удалить</div>
                         </div>`;
                 });
                 document.getElementById('cart-total').innerText = `Итого: $ ${total.toFixed(2)}`;
@@ -229,30 +230,20 @@
             showCart();
         }
 
-        function confirmOrder() {
-            if (cart.length === 0) return;
-            const total = cart.reduce((sum, item) => sum + (item.price * 6), 0);
-            const orderData = { items: cart, total: total };
-            tg.sendData(JSON.stringify(orderData));
-            cart = [];
-            localStorage.removeItem('scout_cart');
-            tg.close();
-        }
-
         function closeCart() {
             document.getElementById('screen-cart').style.display = 'none';
             renderItems();
         }
 
-        function showMain() {
-            document.getElementById('screen-catalog').style.display = 'none';
-            document.getElementById('screen-main').style.display = 'block';
-        }
-
-        function backToCatalog() {
-            document.getElementById('screen-product').style.display = 'none';
-            document.getElementById('screen-catalog').style.display = 'block';
-            renderItems();
+        function confirmOrder() {
+            if (cart.length === 0) return;
+            const total = cart.reduce((sum, item) => sum + (item.price * 6), 0);
+            const orderData = { items: cart, total: total.toFixed(2) };
+            
+            tg.sendData(JSON.stringify(orderData));
+            cart = [];
+            localStorage.removeItem('scout_cart');
+            tg.close();
         }
 
         init();
