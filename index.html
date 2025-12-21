@@ -3,205 +3,224 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Scout Store</title>
+    <title>SCOUT STORE</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --tg-theme-bg-color: #f0f2f5; --primary: #0088cc; --success: #2ecc71; }
-        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--tg-theme-bg-color); margin: 0; padding: 0; -webkit-user-select: none; }
-        
-        /* Loader */
-        #loader-screen { position: fixed; top:0; left:0; width:100%; height:100%; background:white; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999; }
-        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        :root {
+            --tg-theme-bg-color: #fff;
+            --tg-theme-text-color: #000;
+            --tg-theme-button-color: #3390ec;
+            --tg-theme-button-text-color: #fff;
+            --tg-theme-hint-color: #707579;
+        }
 
-        /* Floating Cart */
-        #cart-badge { position: fixed; bottom: 20px; right: 20px; background: var(--primary); color: white; width: 60px; height: 60px; border-radius: 50%; display: none; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 1000; font-size: 24px; cursor: pointer; }
-        #cart-count { position: absolute; top: 0; right: 0; background: red; color: white; border-radius: 50%; padding: 2px 6px; font-size: 12px; border: 2px solid white; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--tg-theme-bg-color);
+            color: var(--tg-theme-text-color);
+            margin: 0; padding: 10px;
+            -webkit-user-select: none;
+        }
 
-        /* Layout */
-        #main-content { padding: 15px; display:none; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .item-card { background: white; padding: 10px; border-radius: 12px; position: relative; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .item-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 8px; }
-        .selected-mark { position: absolute; top: 5px; right: 5px; background: var(--success); color: white; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 12px; border: 2px solid white; }
+        .header {
+            text-align: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 15px;
+        }
 
-        /* Sorting Buttons */
-        .sort-container { display: flex; gap: 8px; margin-bottom: 15px; justify-content: center; }
-        .sort-btn { padding: 6px 12px; border-radius: 15px; border: 1px solid var(--primary); background: white; color: var(--primary); font-size: 11px; font-weight: bold; }
-        .sort-btn.active { background: var(--primary); color: white; }
+        .product-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
 
-        /* Buttons */
-        .btn { border: none; padding: 15px; border-radius: 10px; font-weight: bold; width: 100%; cursor: pointer; font-size: 16px; margin-top: 10px; }
-        .btn-add { background: var(--primary); color: white; }
-        .btn-confirm { background: var(--success); color: white; margin-top: 20px; }
-        .btn-disabled { background: #ccc !important; color: #666; cursor: default; }
+        .product-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #f0f0f0;
+        }
 
-        /* Screens */
-        #screen-cart { display: none; padding: 15px; background: #fff; min-height: 100vh; position: fixed; top: 0; left: 0; width: 100%; box-sizing: border-box; z-index: 2000; overflow-y: auto; }
-        .cart-item { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #eee; padding: 10px 0; }
-        .cart-item img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; }
-        .nav { color: var(--primary); font-weight: bold; cursor: pointer; margin-bottom: 15px; display: block; }
-        .cat-card { background:white; padding:30px; border-radius:15px; margin-bottom:15px; text-align:center; border:1px solid #ddd; font-weight: bold; font-size: 18px; cursor: pointer; }
+        .product-image {
+            width: 100%;
+            height: 120px;
+            object-fit: contain;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .product-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin: 5px 0;
+            height: 34px;
+            overflow: hidden;
+        }
+
+        .product-articul {
+            font-size: 11px;
+            color: var(--tg-theme-hint-color);
+            margin-bottom: 5px;
+        }
+
+        .product-price {
+            font-size: 16px;
+            font-weight: bold;
+            color: #1a5222;
+            margin-bottom: 10px;
+        }
+
+        /* Кнопки управления количеством */
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: auto;
+        }
+
+        .btn {
+            background: var(--tg-theme-button-color);
+            color: var(--tg-theme-button-text-color);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-add {
+            width: 100%;
+        }
+
+        .counter-box {
+            display: none; /* Появляется, когда count > 0 */
+            width: 100%;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .count-val {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .btn-mini {
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
     </style>
 </head>
 <body>
 
-    <div id="loader-screen"><div class="spinner"></div></div>
-    <div id="cart-badge" onclick="showCart()">🛒<span id="cart-count">0</span></div>
+<div class="header">
+    <strong>SCOUT STORE (ОПТ)</strong>
+</div>
 
-    <div id="main-content">
-        <div id="screen-main">
-            <h2 style="text-align:center;">SCOUT STORE</h2>
-            <div class="cat-card" onclick="openCatalog('male')">👟 МУЖСКАЯ ОБУВЬ</div>
-            <div class="cat-card" onclick="openCatalog('female')">👠 ЖЕНСКАЯ ОБУВЬ</div>
-        </div>
+<div class="product-grid" id="grid">
+    <div style="grid-column: 1/-1; text-align: center;">Загрузка товаров...</div>
+</div>
 
-        <div id="screen-catalog" style="display:none;">
-            <div class="nav" onclick="showMain()">⬅ К категориям</div>
-            <div class="sort-container">
-                <button id="sort-asc" class="sort-btn active" onclick="changeSort('asc')">Сначала дешевые</button>
-                <button id="sort-desc" class="sort-btn" onclick="changeSort('desc')">Сначала дорогие</button>
-            </div>
-            <div id="catalog-grid" class="grid"></div>
-        </div>
+<script>
+    const tg = window.Telegram.WebApp;
+    const MainButton = tg.MainButton;
+    let cart = {}; // { articul: { name, price, count, photo } }
 
-        <div id="screen-product" style="display:none;">
-            <div class="nav" onclick="backToCatalog()">⬅ В каталог</div>
-            <img id="p-img" style="width:100%; border-radius:15px;">
-            <h2 id="p-name"></h2>
-            <p id="p-art" style="color:gray;"></p>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
-                <div id="p-price" style="font-size:24px; color:var(--success); font-weight:bold;"></div>
-                <div id="p-box" style="text-align:right; color:gray; font-size:14px; white-space: pre-line;"></div>
-            </div>
-            <button class="btn btn-add" id="add-btn" onclick="addToCart()">➕ Добавить в предзаказ</button>
-        </div>
-    </div>
-
-    <div id="screen-cart">
-        <div class="nav" onclick="closeCart()">⬅ К покупкам</div>
-        <h3>Ваш предзаказ</h3>
-        <div id="cart-items"></div>
-        <div id="cart-total" style="margin-top:20px; font-weight:bold; font-size:20px; text-align:right; border-top: 2px solid #eee; padding-top:10px;"></div>
-        <button class="btn btn-confirm" onclick="confirmOrder()">✅ Подтвердить и отправить</button>
-    </div>
-
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        let allProducts = [], cart = JSON.parse(localStorage.getItem('scout_cart') || '[]');
-        let currentCategory = '', currentSort = 'asc', currentProduct = null;
-
-        async function init() {
-            try {
-                const res = await fetch('products.json?v=' + Date.now());
-                allProducts = await res.json();
-                document.getElementById('loader-screen').style.display = 'none';
-                document.getElementById('main-content').style.display = 'block';
-                updateCartBadge();
-            } catch (e) { console.error(e); }
-        }
-
-        function changeSort(type) {
-            currentSort = type;
-            document.getElementById('sort-asc').classList.toggle('active', type === 'asc');
-            document.getElementById('sort-desc').classList.toggle('active', type === 'desc');
-            renderItems();
-        }
-
-        function openCatalog(cat) {
-            currentCategory = cat;
-            document.getElementById('screen-main').style.display = 'none';
-            document.getElementById('screen-catalog').style.display = 'block';
-            renderItems();
-        }
-
-        function showMain() {
-            document.getElementById('screen-catalog').style.display = 'none';
-            document.getElementById('screen-main').style.display = 'block';
-        }
-
-        function backToCatalog() {
-            document.getElementById('screen-product').style.display = 'none';
-            document.getElementById('screen-catalog').style.display = 'block';
-            renderItems();
-        }
-
-        function renderItems() {
-            const grid = document.getElementById('catalog-grid');
+    async function loadProducts() {
+        try {
+            const response = await fetch('products.json?v=' + Date.now());
+            const products = await response.json();
+            const grid = document.getElementById('grid');
             grid.innerHTML = '';
-            let filtered = allProducts.filter(p => p.category === currentCategory);
-            
-            filtered.sort((a, b) => currentSort === 'asc' ? a.price - b.price : b.price - a.price);
 
-            filtered.forEach(p => {
-                const inCart = cart.some(item => item.articul === p.articul);
-                const div = document.createElement('div');
-                div.className = 'item-card';
-                div.onclick = () => showProduct(p);
-                div.innerHTML = `${inCart ? '<div class="selected-mark">✓</div>' : ''}<img src="${p.photo}"><div style="font-weight:bold; margin-top:10px;">$ ${parseFloat(p.price).toFixed(2)}</div><div style="font-size:11px; color:gray;">${p.name}</div>`;
-                grid.appendChild(div);
+            products.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <img src="${p.photo}" class="product-image">
+                    <div class="product-title">${p.name}</div>
+                    <div class="product-articul">Арт: ${p.articul}</div>
+                    <div class="product-price">$${p.price} <small>(за пару)</small></div>
+                    
+                    <div class="controls" id="controls-${p.articul}">
+                        <button class="btn btn-add" onclick="updateCount('${p.articul}', 1, '${p.name}', ${p.price}, '${p.photo}')">В КОРЗИНУ</button>
+                        <div class="counter-box" id="counter-${p.articul}">
+                            <button class="btn btn-mini" onclick="updateCount('${p.articul}', -1)">-</button>
+                            <span class="count-val" id="val-${p.articul}">0</span>
+                            <button class="btn btn-mini" onclick="updateCount('${p.articul}', 1)">+</button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
             });
+        } catch (e) {
+            document.getElementById('grid').innerHTML = "Ошибка загрузки: " + e;
+        }
+    }
+
+    function updateCount(art, delta, name, price, photo) {
+        if (!cart[art] && delta > 0) {
+            cart[art] = { name, price, count: 0, photo, articul: art };
         }
 
-        function showProduct(p) {
-            currentProduct = p;
-            document.getElementById('p-img').src = p.photo;
-            document.getElementById('p-name').innerText = p.name;
-            document.getElementById('p-art').innerText = "Арт: " + p.articul;
-            document.getElementById('p-price').innerText = `$ ${parseFloat(p.price).toFixed(2)}`;
-            document.getElementById('p-box').innerText = `Короб (6 пар):\n$ ${(p.price * 6).toFixed(2)}`;
-            const inCart = cart.some(item => item.articul === p.articul);
-            const btn = document.getElementById('add-btn');
-            btn.innerText = inCart ? "✓ В предзаказе" : "➕ Добавить в предзаказ";
-            btn.classList.toggle('btn-disabled', inCart);
-            btn.onclick = inCart ? null : addToCart;
-            document.getElementById('screen-catalog').style.display = 'none';
-            document.getElementById('screen-product').style.display = 'block';
-        }
+        if (cart[art]) {
+            cart[art].count += delta;
+            
+            // Визуальное переключение кнопок
+            const addBtn = document.querySelector(`#controls-${art} .btn-add`);
+            const counterBox = document.querySelector(`#counter-${art}`);
+            const valSpan = document.getElementById(`val-${art}`);
 
-        function addToCart() {
-            cart.push(currentProduct);
-            localStorage.setItem('scout_cart', JSON.stringify(cart));
-            updateCartBadge();
-            backToCatalog();
-        }
-
-        function updateCartBadge() {
-            const b = document.getElementById('cart-badge');
-            b.style.display = cart.length ? 'flex' : 'none';
-            document.getElementById('cart-count').innerText = cart.length;
-        }
-
-        function showCart() {
-            const container = document.getElementById('cart-items');
-            container.innerHTML = ''; let total = 0;
-            if (!cart.length) { container.innerHTML = '<p style="text-align:center;">Пусто</p>'; }
-            else {
-                cart.forEach((item, i) => {
-                    const priceBox = item.price * 6; total += priceBox;
-                    container.innerHTML += `<div class="cart-item"><img src="${item.photo}"><div style="flex-grow:1;"><b>${item.name}</b><br><small>$ ${priceBox.toFixed(2)}</small></div><div style="color:red;" onclick="removeFromCart(${i})">Удалить</div></div>`;
-                });
-                document.getElementById('cart-total').innerText = `Итого 6 пар: $ ${total.toFixed(2)}`;
+            if (cart[art].count > 0) {
+                addBtn.style.display = 'none';
+                counterBox.style.display = 'flex';
+                valSpan.innerText = cart[art].count;
+            } else {
+                addBtn.style.display = 'block';
+                counterBox.style.display = 'none';
+                delete cart[art];
             }
-            document.getElementById('screen-cart').style.display = 'block';
         }
+        updateMainButton();
+    }
 
-        function removeFromCart(i) {
-            cart.splice(i, 1);
-            localStorage.setItem('scout_cart', JSON.stringify(cart));
-            updateCartBadge();
-            showCart();
+    function updateMainButton() {
+        const items = Object.values(cart);
+        let totalCount = 0;
+        let totalPrice = 0;
+
+        items.forEach(i => {
+            totalCount += i.count;
+            totalPrice += (i.price * 6 * i.count);
+        });
+
+        if (totalCount > 0) {
+            MainButton.setText(`ОФОРМИТЬ: ${totalCount} кор. ($${totalPrice.toFixed(2)})`);
+            MainButton.show();
+        } else {
+            MainButton.hide();
         }
+    }
 
-        function closeCart() { document.getElementById('screen-cart').style.display = 'none'; renderItems(); }
+    tg.onEvent('mainButtonClicked', function() {
+        const data = {
+            items: Object.values(cart),
+            total: 0 // Бот пересчитает сам для точности
+        };
+        tg.sendData(JSON.stringify(data));
+        tg.close();
+    });
 
-        function confirmOrder() {
-            const total = cart.reduce((sum, item) => sum + (item.price * 6), 0);
-            tg.sendData(JSON.stringify({ items: cart, total: total.toFixed(2) }));
-            cart = []; localStorage.removeItem('scout_cart'); tg.close();
-        }
-        init();
-    </script>
+    tg.expand();
+    loadProducts();
+</script>
+
 </body>
 </html>
