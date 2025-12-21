@@ -13,7 +13,6 @@
             --tg-theme-text-color: #222222;
         }
 
-        /* Убираем все системные отступы и фиксируем экран */
         * { box-sizing: border-box; }
         
         body {
@@ -26,93 +25,100 @@
             overflow: hidden;
         }
 
-        /* ИСПРАВЛЕННАЯ ШАПКА: Добавлен фиксированный отступ сверху */
+        /* Шапка с категориями */
         header {
             background: var(--tg-theme-bg-color);
-            padding: 15px 10px 10px 10px; /* Увеличен верхний отступ */
+            padding: 10px 10px 8px 10px;
             display: flex; gap: 8px;
             overflow-x: auto;
-            border-bottom: 1px solid #e0e0e0;
-            -webkit-overflow-scrolling: touch;
+            border-bottom: 1px solid #eee;
             flex-shrink: 0;
+            -webkit-overflow-scrolling: touch;
         }
-        
         header::-webkit-scrollbar { display: none; }
 
         .cat-btn {
             background: #f0f0f0; border: none; 
-            padding: 10px 16px; border-radius: 12px;
-            font-size: 13px; font-weight: 700;
-            text-transform: uppercase; color: #666;
-            white-space: nowrap;
-            transition: background 0.2s;
+            padding: 6px 12px; border-radius: 10px;
+            font-size: 12px; font-weight: 600;
+            color: #555; white-space: nowrap;
         }
         .cat-btn.active {
             background: var(--tg-theme-button-color);
             color: white;
         }
 
-        /* КОНТЕНТНАЯ ОБЛАСТЬ */
+        /* Сетка товаров */
         #product-grid {
             flex-grow: 1;
             display: grid; 
             grid-template-columns: 1fr 1fr;
-            gap: 12px; padding: 15px 10px 120px 10px;
+            gap: 8px; padding: 10px 10px 100px 10px;
             overflow-y: auto;
         }
 
         .product-card {
-            background: #fff; border-radius: 15px;
-            padding: 12px; display: flex; flex-direction: column;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            background: #fff; border-radius: 10px;
+            padding: 8px; display: flex; flex-direction: column;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         .product-card img {
             width: 100%; aspect-ratio: 1;
-            object-fit: cover; border-radius: 10px;
+            object-fit: cover; border-radius: 6px;
         }
 
         .product-name {
-            font-size: 14px; font-weight: 600; margin: 10px 0 4px;
-            height: 36px; overflow: hidden; line-height: 1.3;
+            font-size: 13px; font-weight: 600; margin: 6px 0 2px;
+            height: 32px; overflow: hidden; line-height: 1.2;
         }
 
-        .product-art { font-size: 11px; color: #888; margin-bottom: 6px; }
-        .ordered-count { color: var(--tg-theme-button-color); font-weight: 800; }
-        .product-price { font-size: 17px; font-weight: 800; color: #000; }
+        .product-art { font-size: 10px; color: #888; }
+        
+        /* Статистика с новой строки */
+        .ordered-badge { 
+            display: block; /* Принудительный перенос */
+            color: var(--tg-theme-button-color); 
+            font-weight: 700; 
+            margin-top: 2px;
+        }
 
-        /* ЭКРАН 3: КАРТОЧКА ТОВАРА */
+        .product-price { font-size: 15px; font-weight: 800; margin-top: 4px; }
+
+        /* КОМПАКТНЫЙ 3 ЭКРАН */
         #product-detail {
             display: none; position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background: #fff; z-index: 1000;
-            padding: 20px; overflow-y: auto;
+            padding: 15px; overflow-y: auto;
         }
 
-        .detail-img { width: 100%; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .detail-img { 
+            width: 100%; max-height: 250px; /* Ограничил высоту */
+            object-fit: contain; border-radius: 10px; 
+            margin-bottom: 10px; background: #f9f9f9;
+        }
         
         .stats-box {
-            background: #f8f9fa; padding: 15px;
-            border-radius: 12px; margin: 20px 0;
-            border: 1px solid #eee;
+            background: #f4f7f9; padding: 8px 12px;
+            border-radius: 8px; margin: 10px 0;
+            font-size: 12px;
         }
-        .ord-total { font-weight: 700; font-size: 15px; margin-bottom: 6px; }
-        .view-now { color: #d32f2f; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 6px; }
+        .view-now { color: #d32f2f; font-weight: 600; margin-top: 2px; }
 
-        .price-section { margin: 25px 0; padding-top: 15px; border-top: 1px solid #eee; }
-        .p-label { color: #777; font-size: 15px; margin-bottom: 5px; }
-        .p-main { font-size: 28px; font-weight: 900; color: #000; }
+        .price-section { margin: 10px 0; padding-top: 10px; border-top: 1px solid #eee; }
+        .p-label { color: #777; font-size: 13px; }
+        .p-main { font-size: 22px; font-weight: 900; color: #000; }
 
-        .back-btn { background: #f0f0f0; border: none; padding: 12px 20px; border-radius: 12px; font-weight: 600; margin-bottom: 20px; }
-        .add-btn { background: var(--tg-theme-button-color); color: #fff; border: none; width: 100%; padding: 20px; border-radius: 15px; font-size: 16px; font-weight: 800; }
+        .back-btn { background: #f0f0f0; border: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; margin-bottom: 10px; }
+        .add-btn { background: var(--tg-theme-button-color); color: #fff; border: none; width: 100%; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 800; }
 
-        /* КНОПКА ЗАКАЗА */
+        /* Кнопка заказа внизу */
         .cart-bar { 
-            position: fixed; bottom: 25px; left: 15px; right: 15px; 
+            position: fixed; bottom: 15px; left: 10px; right: 10px; 
             background: var(--tg-theme-button-color); color: #fff; 
-            padding: 20px; border-radius: 18px; text-align: center; 
-            font-weight: 800; z-index: 500; 
-            box-shadow: 0 10px 25px rgba(51, 144, 236, 0.4); 
+            padding: 15px; border-radius: 12px; text-align: center; 
+            font-weight: 800; z-index: 500; font-size: 14px;
         }
     </style>
 </head>
@@ -123,19 +129,19 @@
 
 <div id="product-detail">
     <button class="back-btn" onclick="closeDetail()">← Назад</button>
-    <img id="detail-img" src="">
-    <h2 id="detail-name" style="margin: 0;"></h2>
-    <div id="detail-art" style="color: #999; margin-top: 5px;"></div>
+    <center><img id="detail-img" src=""></center>
+    <h3 id="detail-name" style="margin: 5px 0 0 0; font-size: 16px;"></h3>
+    <div id="detail-art" style="color: #999; font-size: 12px;"></div>
 
     <div class="stats-box">
-        <div id="detail-ordered" class="ord-total"></div>
-        <div class="view-now">👁 Эту модель смотрят <span id="view-count" style="margin: 0 4px;"></span> чел.</div>
+        <div id="detail-ordered" style="font-weight: bold;"></div>
+        <div class="view-now">👁 Эту модель смотрят <span id="view-count"></span> чел.</div>
     </div>
 
     <div class="price-section">
         <div id="detail-price-single" class="p-label"></div>
         <div id="detail-price-total" class="p-main"></div>
-        <div style="font-size: 13px; color: #aaa; margin-top: 8px;">Оптовая цена за короб (6 пар)</div>
+        <div style="font-size: 11px; color: #aaa;">Цена за коробку (6 пар)</div>
     </div>
 
     <button class="add-btn" id="add-to-cart">Добавить в корзину</button>
@@ -150,15 +156,13 @@
     tg.expand();
     let allProducts = [], cart = [];
 
-    // Загрузка с меткой времени для обхода кэша
-    fetch('products.json?t=' + Date.now())
+    fetch('products.json?v=' + Date.now())
         .then(r => r.json())
         .then(data => {
             allProducts = data;
             renderCategories();
             renderProducts('все');
-        })
-        .catch(err => console.error("Ошибка загрузки:", err));
+        });
 
     function renderCategories() {
         const cats = ['все', ...new Set(allProducts.map(p => p.category))];
@@ -177,7 +181,7 @@
         const grid = document.getElementById('product-grid');
         const filtered = cat === 'все' ? allProducts : allProducts.filter(p => p.category === cat);
         grid.innerHTML = filtered.map(p => {
-            const ord = p.ordered_count > 0 ? `<span class="ordered-count"> (Заказано ${p.ordered_count})</span>` : '';
+            const ord = p.ordered_count > 0 ? `<span class="ordered-badge">Заказано ${p.ordered_count} раз</span>` : '';
             return `
                 <div class="product-card" onclick="openDetail('${p.articul}')">
                     <img src="${p.photo}">
@@ -194,11 +198,11 @@
         const price = parseFloat(p.price);
         document.getElementById('detail-img').src = p.photo;
         document.getElementById('detail-name').innerText = p.name;
-        document.getElementById('detail-art').innerText = 'Арт: ' + p.articul;
-        document.getElementById('detail-price-single').innerText = `Цена за одну пару: $${price.toFixed(2)}`;
-        document.getElementById('detail-price-total').innerText = `За упаковку: $${(price * 6).toFixed(2)}`;
-        document.getElementById('detail-ordered').innerText = `🔥 Заказано всего: ${p.ordered_count || 0} раз`;
-        document.getElementById('view-count').innerText = p.viewing_now || Math.floor(Math.random() * 5) + 2;
+        document.getElementById('detail-art').innerText = 'Артикул: ' + p.articul;
+        document.getElementById('detail-price-single').innerText = `Цена за пару: $${price.toFixed(2)}`;
+        document.getElementById('detail-price-total').innerText = `Короб: $${(price * 6).toFixed(2)}`;
+        document.getElementById('detail-ordered').innerText = `🔥 Купили ${p.ordered_count || 0} раз`;
+        document.getElementById('view-count').innerText = p.viewing_now || Math.floor(Math.random() * 3) + 2;
         document.getElementById('product-detail').style.display = 'block';
         document.getElementById('add-to-cart').onclick = () => { cart.push(p); updateCart(); closeDetail(); };
     }
