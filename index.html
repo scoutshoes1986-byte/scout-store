@@ -25,6 +25,9 @@
         .item-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 8px; }
         .selected-mark { position: absolute; top: 5px; right: 5px; background: var(--success); color: white; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 12px; border: 2px solid white; }
 
+        /* Статистика заказов */
+        .order-count { display: block; color: var(--primary); font-size: 11px; font-weight: bold; margin-top: 2px; }
+
         /* Кнопки */
         .btn { border: none; padding: 15px; border-radius: 10px; font-weight: bold; width: 100%; cursor: pointer; font-size: 16px; margin-top: 10px; }
         .btn-add { background: var(--primary); color: white; }
@@ -118,6 +121,7 @@
             
             filtered.forEach(p => {
                 const inCart = cart.some(item => item.articul === p.articul);
+                const orders = p.ordered_count ? `<span class="order-count">Заказано ${p.ordered_count} раз</span>` : '';
                 const div = document.createElement('div');
                 div.className = 'item-card';
                 div.onclick = () => showProduct(p);
@@ -125,7 +129,8 @@
                     ${inCart ? '<div class="selected-mark">✓</div>' : ''}
                     <img src="${p.photo}">
                     <div style="font-weight:bold; margin-top:5px;">$ ${parseFloat(p.price).toFixed(2)}</div>
-                    <div style="font-size:11px; color:gray;">${p.name}</div>
+                    ${orders}
+                    <div style="font-size:11px; color:gray; margin-top:2px;">${p.name}</div>
                 `;
                 grid.appendChild(div);
             });
