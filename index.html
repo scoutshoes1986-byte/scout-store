@@ -10,54 +10,30 @@
             --tg-theme-bg-color: #ffffff;
             --tg-theme-text-color: #222222;
             --tg-theme-button-color: #3390ec;
-            --tg-theme-button-text-color: #ffffff;
             --tg-theme-secondary-bg-color: #f4f4f7;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, sans-serif;
             background-color: var(--tg-theme-secondary-bg-color);
             color: var(--tg-theme-text-color);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden; /* Предотвращаем лишнюю прокрутку всего тела */
+            margin: 0; padding: 0;
+            display: flex; flex-direction: column; height: 100vh;
         }
 
-        /* ИСПРАВЛЕННАЯ ШАПКА */
         header {
             background: var(--tg-theme-bg-color);
-            padding: 12px 10px; /* Увеличен отступ сверху и снизу */
-            position: relative; /* Убираем sticky, если оно конфликтовало */
-            z-index: 10;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            display: flex;
-            gap: 10px;
+            padding: 15px 10px;
+            display: flex; gap: 10px;
             overflow-x: auto;
-            white-space: nowrap;
-            -webkit-overflow-scrolling: touch;
-            min-height: 44px; /* Гарантированная высота для кнопок */
-        }
-
-        /* Скрываем скроллбар в шапке для красоты */
-        header::-webkit-scrollbar {
-            display: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
         .cat-btn {
             background: var(--tg-theme-secondary-bg-color);
-            border: none;
-            padding: 8px 18px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            color: var(--tg-theme-text-color);
-            transition: all 0.2s ease;
+            border: none; padding: 8px 15px;
+            border-radius: 15px; font-size: 13px; font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         .cat-btn.active {
@@ -65,166 +41,104 @@
             color: white;
         }
 
-        /* Сетка товаров */
+        /* 2 ЭКРАН: Витрина */
         #product-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            padding: 15px 10px;
-            flex-grow: 1;
-            overflow-y: auto;
-            padding-bottom: 80px; /* Отступ под нижнюю кнопку */
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 10px; padding: 10px;
+            overflow-y: auto; padding-bottom: 100px;
         }
 
         .product-card {
             background: var(--tg-theme-bg-color);
-            border-radius: 14px;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-radius: 12px; padding: 10px;
+            display: flex; flex-direction: column;
         }
 
         .product-card img {
-            width: 100%;
-            aspect-ratio: 1;
-            object-fit: cover;
-            border-radius: 10px;
-            margin-bottom: 10px;
+            width: 100%; aspect-ratio: 1;
+            object-fit: cover; border-radius: 8px;
         }
 
         .product-name {
-            font-size: 14px;
-            font-weight: 600;
-            line-height: 1.3;
-            margin-bottom: 5px;
-            height: 36px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+            font-size: 14px; font-weight: 600; margin: 8px 0 4px;
+            height: 36px; overflow: hidden;
         }
 
         .product-art {
-            font-size: 11px;
-            color: #888;
-            margin-bottom: 8px;
+            font-size: 11px; color: #777;
         }
 
-        .ordered-badge {
+        /* ПОДСВЕТКА СТАТИСТИКИ НА 2 ЭКРАНЕ */
+        .ordered-count {
             color: var(--tg-theme-button-color);
             font-weight: bold;
         }
 
         .product-price {
-            font-size: 16px;
-            font-weight: 800;
-            color: var(--tg-theme-text-color);
-            margin-top: auto;
+            font-size: 16px; font-weight: 800; margin-top: 8px;
         }
 
-        /* Карточка товара (3 экран) */
+        /* 3 ЭКРАН: Карточка */
         #product-detail {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            display: none; position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
             background: var(--tg-theme-bg-color);
-            z-index: 100;
-            overflow-y: auto;
-            padding: 20px;
+            z-index: 100; padding: 20px; overflow-y: auto;
         }
 
-        .detail-img {
-            width: 100%;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-
-        .stats-box {
+        .stats-container {
             background: var(--tg-theme-secondary-bg-color);
-            padding: 15px;
-            border-radius: 12px;
-            margin: 20px 0;
-            font-size: 14px;
-            line-height: 1.6;
+            padding: 15px; border-radius: 12px; margin: 15px 0;
         }
 
-        .view-now {
-            color: #e53935;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-weight: bold;
-            margin-top: 5px;
+        .ordered-total {
+            font-weight: 700; font-size: 14px; margin-bottom: 5px;
+        }
+
+        .viewing-now {
+            color: #d32f2f; font-weight: 600; font-size: 13px;
+            display: flex; align-items: center; gap: 5px;
         }
 
         .back-btn {
-            background: var(--tg-theme-secondary-bg-color);
-            border: none;
-            color: var(--tg-theme-text-color);
-            padding: 8px 15px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            cursor: pointer;
-        }
-
-        /* Кнопка оформления */
-        .cart-bar {
-            position: fixed;
-            bottom: 20px;
-            left: 10px;
-            right: 10px;
-            background: var(--tg-theme-button-color);
-            color: white;
-            padding: 16px;
-            border-radius: 16px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            z-index: 50;
+            background: #eee; border: none; padding: 8px 15px;
+            border-radius: 8px; margin-bottom: 15px;
         }
 
         .add-btn {
             background: var(--tg-theme-button-color);
-            color: white;
-            border: none;
-            width: 100%;
-            padding: 16px;
-            border-radius: 14px;
-            font-size: 16px;
-            font-weight: bold;
-            margin-top: 20px;
+            color: white; border: none; width: 100%;
+            padding: 16px; border-radius: 12px;
+            font-size: 16px; font-weight: bold;
+        }
+
+        .cart-bar {
+            position: fixed; bottom: 20px; left: 10px; right: 10px;
+            background: var(--tg-theme-button-color); color: white;
+            padding: 16px; border-radius: 15px; text-align: center;
+            font-weight: bold; z-index: 50;
         }
     </style>
 </head>
 <body>
 
 <header id="categories"></header>
-
 <div id="product-grid"></div>
 
 <div id="product-detail">
     <button class="back-btn" onclick="closeDetail()">← Назад</button>
-    <img id="detail-img" src="" class="detail-img">
-    <h2 id="detail-name" style="margin: 0 0 10px 0;"></h2>
-    <div id="detail-art" style="font-size: 14px; color: #888;"></div>
-    
-    <div class="stats-box">
-        <div id="detail-ordered" style="font-weight: 600;"></div>
-        <div class="view-now">
-            <span>👁</span> Эту модель смотрят сейчас <span id="view-count"></span> чел.
+    <img id="detail-img" src="" style="width: 100%; border-radius: 12px;">
+    <h2 id="detail-name"></h2>
+    <div id="detail-art" style="color: #777;"></div>
+
+    <div class="stats-container">
+        <div id="detail-ordered" class="ordered-total"></div>
+        <div id="detail-viewing" class="viewing-now">
+            <span>👁</span> Эту модель смотрят прямо сейчас <span id="view-count"></span> чел.
         </div>
     </div>
 
-    <h3 id="detail-price" style="font-size: 24px; margin: 10px 0;"></h3>
-    <p style="color: #666; font-size: 14px;">Упаковка: 6 пар (полная ростовка)</p>
+    <h3 id="detail-price"></h3>
     <button class="add-btn" id="add-to-cart">Добавить в корзину</button>
 </div>
 
@@ -234,14 +148,13 @@
 
 <script>
     let tg = window.Telegram.WebApp;
-    tg.ready();
     tg.expand();
 
     let allProducts = [];
     let cart = [];
 
-    // Загрузка
-    fetch('products.json?v=' + Date.now())
+    // Загрузка данных с защитой от кэша
+    fetch('products.json?nocache=' + Date.now())
         .then(r => r.json())
         .then(data => {
             allProducts = data;
@@ -251,11 +164,8 @@
 
     function renderCategories() {
         const cats = ['все', ...new Set(allProducts.map(p => p.category))];
-        const container = document.getElementById('categories');
-        container.innerHTML = cats.map(c => `
-            <button class="cat-btn ${c === 'все' ? 'active' : ''}" onclick="filterCat(this, '${c}')">
-                ${c}
-            </button>
+        document.getElementById('categories').innerHTML = cats.map(c => `
+            <button class="cat-btn ${c === 'все' ? 'active' : ''}" onclick="filterCat(this, '${c}')">${c}</button>
         `).join('');
     }
 
@@ -266,16 +176,18 @@
     }
 
     function renderProducts(cat) {
-        const container = document.getElementById('product-grid');
+        const grid = document.getElementById('product-grid');
         const filtered = cat === 'все' ? allProducts : allProducts.filter(p => p.category === cat);
         
-        container.innerHTML = filtered.map(p => {
-            const ordered = p.ordered_count > 0 ? `<span class="ordered-badge"> (Заказано ${p.ordered_count})</span>` : '';
+        grid.innerHTML = filtered.map(p => {
+            // ВЫВОД НА 2 ЭКРАНЕ
+            const orderedInfo = p.ordered_count > 0 ? `<span class="ordered-count"> (Заказано ${p.ordered_count} раза)</span>` : '';
+            
             return `
                 <div class="product-card" onclick="openDetail('${p.articul}')">
                     <img src="${p.photo}">
                     <div class="product-name">${p.name}</div>
-                    <div class="product-art">Арт: ${p.articul}${ordered}</div>
+                    <div class="product-art">Арт: ${p.articul}${orderedInfo}</div>
                     <div class="product-price">$ ${p.price}</div>
                 </div>
             `;
@@ -288,8 +200,10 @@
         document.getElementById('detail-name').innerText = p.name;
         document.getElementById('detail-art').innerText = 'Артикул: ' + p.articul;
         document.getElementById('detail-price').innerText = '$' + p.price + ' / пара';
-        document.getElementById('detail-ordered').innerText = `🔥 Заказано за всё время: ${p.ordered_count || 0} раз`;
-        document.getElementById('view-count').innerText = p.viewing_now || Math.floor(Math.random() * 4) + 3;
+        
+        // ВЫВОД НА 3 ЭКРАНЕ
+        document.getElementById('detail-ordered').innerText = `Заказано за всё время: ${p.ordered_count || 0} раз`;
+        document.getElementById('view-count').innerText = p.viewing_now || Math.floor(Math.random() * 5) + 3;
 
         document.getElementById('product-detail').style.display = 'block';
         document.getElementById('add-to-cart').onclick = () => {
@@ -304,12 +218,9 @@
     }
 
     function updateCart() {
-        const bar = document.getElementById('cart-bar');
         const total = cart.reduce((sum, p) => sum + (p.price * 6), 0);
-        if (cart.length > 0) {
-            bar.style.display = 'block';
-            document.getElementById('cart-total').innerText = total.toFixed(2);
-        }
+        document.getElementById('cart-bar').style.display = 'block';
+        document.getElementById('cart-total').innerText = total.toFixed(2);
     }
 
     function sendOrder() {
@@ -320,6 +231,5 @@
         tg.close();
     }
 </script>
-
 </body>
 </html>
