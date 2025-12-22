@@ -88,7 +88,7 @@
         tg.expand();
         
         let allProducts = [];
-        let cart = JSON.parse(localStorage.getItem('scout_cart_v8') || '{}');
+        let cart = JSON.parse(localStorage.getItem('scout_cart_v9') || '{}');
         let currentCategory = '';
         let currentSort = 'asc';
 
@@ -172,7 +172,7 @@
             }
         }
 
-        function saveCart() { localStorage.setItem('scout_cart_v8', JSON.stringify(cart)); }
+        function saveCart() { localStorage.setItem('scout_cart_v9', JSON.stringify(cart)); }
 
         function updateCartBadge() {
             const count = Object.keys(cart).length;
@@ -220,29 +220,24 @@
             const items = Object.values(cart);
             if (items.length === 0) return;
             
-            let finalTotal = 0;
             const finalItems = items.map(i => {
-                const boxPrice = parseFloat(i.price) * 6;
-                const itemSum = boxPrice * i.boxes;
-                finalTotal += itemSum;
-                
+                // ПЕРЕДАЕМ ПАРЫ, А НЕ КОРОБА (для корректного счета бота)
+                const totalPairsForItem = i.boxes * 6;
                 return {
                     name: i.name,
                     articul: i.articul,
                     photo: i.photo,
-                    price: boxPrice.toFixed(2), // Передаем цену ЗА КОРОБ
-                    quantity: i.boxes,          // Передаем КОЛИЧЕСТВО КОРОБОВ
-                    total: itemSum.toFixed(2)   // Итоговая сумма по позиции
+                    price: parseFloat(i.price).toFixed(2), // Цена за 1 пару
+                    quantity: totalPairsForItem            // Общее кол-во пар
                 };
             });
 
             tg.sendData(JSON.stringify({
-                items: finalItems,
-                total_price: finalTotal.toFixed(2)
+                items: finalItems
             }));
             
             cart = {};
-            localStorage.removeItem('scout_cart_v8');
+            localStorage.removeItem('scout_cart_v9');
             tg.close();
         }
         init();
