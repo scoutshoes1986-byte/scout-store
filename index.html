@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Scout Store 1.0.6</title>
+    <title>Scout Store 1.0.8</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { --tg-theme-bg-color: #f0f2f5; --primary: #0088cc; --success: #2ecc71; }
@@ -68,11 +68,11 @@
     </div>
 
     <div id="screen-cart">
-        <div class="nav" onclick="closeCart()">⬅ Вернуться в магазин</div>
+        <div class="nav" onclick="closeCart()">⬅ Назад</div>
         <h3>Ваш предзаказ</h3>
         <div id="cart-items"></div>
         <div id="cart-total" style="margin-top:20px; font-weight:bold; font-size:18px; text-align:right; border-top: 2px solid #eee; padding-top:10px;"></div>
-        <button class="btn btn-confirm" onclick="confirmOrder()">✅ Подтвердить и отправить</button>
+        <button class="btn btn-confirm" onclick="confirmOrder()">✅ Отправить заказ</button>
     </div>
 
     <script>
@@ -80,7 +80,7 @@
         tg.expand();
         
         let allProducts = [];
-        let cart = {}; // Очищаем корзину при каждом запуске для надежности v1.0.6
+        let cart = {};
         let currentCategory = '';
         let currentProduct = null;
 
@@ -90,7 +90,7 @@
                 allProducts = await res.json();
                 document.getElementById('loader-screen').style.display = 'none';
                 document.getElementById('main-content').style.display = 'block';
-            } catch (e) { alert("Ошибка загрузки данных"); }
+            } catch (e) { console.error("Load error"); }
         }
 
         function openCatalog(cat) {
@@ -113,10 +113,8 @@
         function renderItems() {
             const grid = document.getElementById('catalog-grid');
             grid.innerHTML = '';
-            // Жесткая фильтрация: на втором экране только выбранный пол
-            let filtered = allProducts.filter(p => p.category === currentCategory);
-
-            filtered.forEach(p => {
+            // Фильтрация по category из твоего Excel
+            allProducts.filter(p => p.category === currentCategory).forEach(p => {
                 const inCart = cart[p.articul];
                 const div = document.createElement('div');
                 div.className = 'item-card';
@@ -125,7 +123,7 @@
                     ${inCart ? '<div class="selected-mark">✓</div>' : ''}
                     <img src="${p.photo}">
                     <div style="font-weight:bold; margin-top:10px;">$ ${parseFloat(p.price).toFixed(2)}</div>
-                    <div style="font-size:11px; color:gray; margin-top:4px;">${p.name}</div>
+                    <div style="font-size:11px; color:gray;">${p.name}</div>
                 `;
                 grid.appendChild(div);
             });
@@ -137,19 +135,15 @@
             document.getElementById('p-name').innerText = p.name;
             document.getElementById('p-art').innerText = "Арт: " + p.articul;
             document.getElementById('p-price').innerText = `$ ${parseFloat(p.price).toFixed(2)}`;
-            
-            // Расчет: Korob пар в одном ящике за цену price_opt
+            // Расчет: Korob пар в одном ящике за цену price_opt из Excel
             document.getElementById('p-box').innerText = `Короб (${p.Korob} пар):\n$ ${parseFloat(p.price_opt).toFixed(2)}`;
-            
             document.getElementById('screen-catalog').style.display = 'none';
             document.getElementById('screen-product').style.display = 'block';
         }
 
         function addToCart() {
             const art = currentProduct.articul;
-            if (!cart[art]) {
-                cart[art] = { ...currentProduct, boxes: 1 };
-            }
+            if (!cart[art]) cart[art] = { ...currentProduct, boxes: 1 };
             updateCartBadge();
             showCart();
         }
@@ -176,32 +170,25 @@
             let totalPairs = 0;
             const items = Object.values(cart);
 
-            if (items.length === 0) {
-                container.innerHTML = '<p style="text-align:center;">Корзина пуста</p>';
-                document.getElementById('cart-total').innerText = '';
-            } else {
-                items.forEach((item) => {
-                    const itemTotal = item.price_opt * item.boxes; // Итого за короба
-                    totalMoney += itemTotal;
-                    totalPairs += (item.boxes * item.Korob); // Общее число пар
-
-                    container.innerHTML += `
-                        <div class="cart-item">
-                            <img src="${item.photo}">
-                            <div class="cart-info">
-                                <div style="font-weight:bold;">${item.name}</div>
-                                <div style="font-size:12px; color:gray;">Арт: ${item.articul}</div>
-                                <div class="cart-controls">
-                                    <button class="qty-btn" onclick="changeQty('${item.articul}', -1)">-</button>
-                                    <span class="qty-num">${item.boxes} кор.</span>
-                                    <button class="qty-btn" onclick="changeQty('${item.articul}', 1)">+</button>
-                                    <span style="margin-left:auto; font-weight:bold;">$ ${itemTotal.toFixed(2)}</span>
-                                </div>
+            items.forEach((item) => {
+                const itemTotal = item.price_opt * item.boxes;
+                totalMoney += itemTotal;
+                totalPairs += (item.boxes * item.Korob);
+                container.innerHTML += `
+                    <div class="cart-item">
+                        <img src="${item.photo}">
+                        <div class="cart-info">
+                            <b>${item.name}</b><br><small>Арт: ${item.articul}</small>
+                            <div class="cart-controls">
+                                <button class="qty-btn" onclick="changeQty('${item.articul}', -1)">-</button>
+                                <span class="qty-num">${item.boxes} кор.</span>
+                                <button class="qty-btn" onclick="changeQty('${item.articul}', 1)">+</button>
+                                <b style="margin-left:auto;">$ ${itemTotal.toFixed(2)}</b>
                             </div>
-                        </div>`;
-                });
-                document.getElementById('cart-total').innerHTML = `Всего: ${totalPairs} пар<br>Сумма: $ ${totalMoney.toFixed(2)}`;
-            }
+                        </div>
+                    </div>`;
+            });
+            document.getElementById('cart-total').innerHTML = `Всего: ${totalPairs} пар<br>Сумма: $ ${totalMoney.toFixed(2)}`;
             document.getElementById('screen-cart').style.display = 'block';
             document.getElementById('main-content').style.display = 'none';
         }
@@ -209,23 +196,25 @@
         function closeCart() { 
             document.getElementById('screen-cart').style.display = 'none'; 
             document.getElementById('main-content').style.display = 'block';
-            renderItems(); 
         }
 
         function confirmOrder() {
             const items = Object.values(cart);
             if (items.length === 0) return;
             
-            const dataForBot = items.map(i => ({
-                art: i.articul,
-                name: i.name,
-                boxes: i.boxes,
-                pairs: i.boxes * i.Korob,
-                total_sum: (i.price_opt * i.boxes).toFixed(2),
-                photo: i.photo
-            }));
+            const finalData = {
+                action: "order",
+                items: items.map(i => ({
+                    art: i.articul,
+                    name: i.name,
+                    boxes: i.boxes,
+                    pairs: i.boxes * i.Korob,
+                    sum: (i.price_opt * i.boxes).toFixed(2),
+                    img: i.photo
+                }))
+            };
             
-            tg.sendData(JSON.stringify(dataForBot));
+            tg.sendData(JSON.stringify(finalData));
             tg.close();
         }
 
