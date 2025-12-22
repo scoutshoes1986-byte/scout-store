@@ -19,7 +19,6 @@
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .item-card { background: white; padding: 10px; border-radius: 12px; position: relative; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .item-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 8px; }
-        .selected-mark { position: absolute; top: 5px; right: 5px; background: var(--success); color: white; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 12px; border: 2px solid white; }
         
         .btn { border: none; padding: 15px; border-radius: 10px; font-weight: bold; width: 100%; cursor: pointer; font-size: 16px; margin-top: 10px; }
         .btn-add { background: var(--primary); color: white; }
@@ -27,15 +26,19 @@
         
         #screen-cart { display: none; padding: 15px; background: #fff; min-height: 100vh; position: fixed; top: 0; left: 0; width: 100%; box-sizing: border-box; z-index: 2000; overflow-y: auto; }
         .cart-item { display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #eee; padding: 15px 0; }
-        .cart-item img { width: 70px; height: 70px; border-radius: 8px; object-fit: cover; }
+        .cart-item img { width: 65px; height: 65px; border-radius: 8px; object-fit: cover; }
         .cart-info { flex-grow: 1; }
         
-        .cart-controls { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
-        .qty-btn { background: #eef1f4; border: none; width: 36px; height: 36px; border-radius: 8px; font-size: 22px; font-weight: bold; color: var(--primary); cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .qty-num { font-weight: bold; font-size: 18px; min-width: 30px; text-align: center; }
+        .cart-controls { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+        .qty-btn { background: #f0f2f5; border: none; width: 34px; height: 34px; border-radius: 8px; font-size: 20px; font-weight: bold; color: var(--primary); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .qty-num { font-weight: bold; font-size: 18px; min-width: 25px; text-align: center; }
 
         .nav { color: var(--primary); font-weight: bold; cursor: pointer; margin-bottom: 15px; display: block; }
         .cat-card { background:white; padding:30px; border-radius:15px; margin-bottom:15px; text-align:center; border:1px solid #ddd; font-weight: bold; font-size: 18px; cursor: pointer; }
+        
+        .sort-container { margin-bottom: 15px; display: flex; gap: 10px; justify-content: center; }
+        .sort-btn { padding: 8px 12px; border-radius: 20px; border: 1px solid var(--primary); background: white; color: var(--primary); font-size: 12px; cursor: pointer; }
+        .sort-btn.active { background: var(--primary); color: white; }
     </style>
 </head>
 <body>
@@ -51,15 +54,19 @@
         </div>
 
         <div id="screen-catalog" style="display:none;">
-            <div class="nav" onclick="showMain()">⬅ К выбору пола</div>
+            <div class="nav" onclick="showMain()">⬅ К категориям</div>
+            <div class="sort-container">
+                <button class="sort-btn active" id="sort-asc" onclick="setSort('asc')">Сначала дешевые</button>
+                <button class="sort-btn" id="sort-desc" onclick="setSort('desc')">Сначала дорогие</button>
+            </div>
             <div id="catalog-grid" class="grid"></div>
         </div>
 
         <div id="screen-product" style="display:none;">
             <div class="nav" onclick="backToCatalog()">⬅ В каталог</div>
             <img id="p-img" style="width:100%; border-radius:15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-            <h2 id="p-name" style="margin-top:15px; margin-bottom:5px;"></h2>
-            <p id="p-art" style="color:gray; margin:0; font-size: 14px;"></p>
+            <h2 id="p-name" style="margin-top:15px;"></h2>
+            <p id="p-art" style="color:gray;"></p>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
                 <div><small>Цена за пару:</small><div id="p-price" style="font-size:24px; color:var(--success); font-weight:bold;"></div></div>
                 <div id="p-box" style="text-align:right; color:gray; font-size:14px; white-space: pre-line;"></div>
@@ -81,7 +88,9 @@
         tg.expand();
         
         let allProducts = [];
-        let cart = JSON.parse(localStorage.getItem('scout_cart_v4') || '{}');
+        let cart = JSON.parse(localStorage.getItem('scout_cart_v5') || '{}');
+        let currentCategory = '';
+        let currentSort = 'asc';
 
         async function init() {
             try {
@@ -90,23 +99,34 @@
                 document.getElementById('loader-screen').style.display = 'none';
                 document.getElementById('main-content').style.display = 'block';
                 updateCartBadge();
-            } catch (e) { console.error("Ошибка инициализации", e); }
+            } catch (e) { console.error(e); }
+        }
+
+        function setSort(type) {
+            currentSort = type;
+            document.getElementById('sort-asc').classList.toggle('active', type === 'asc');
+            document.getElementById('sort-desc').classList.toggle('active', type === 'desc');
+            renderItems();
         }
 
         function openCatalog(cat) {
+            currentCategory = cat;
             document.getElementById('screen-main').style.display = 'none';
             document.getElementById('screen-catalog').style.display = 'block';
+            renderItems();
+        }
+
+        function renderItems() {
             const grid = document.getElementById('catalog-grid');
             grid.innerHTML = '';
-            allProducts.filter(p => p.category === cat).forEach(p => {
+            let filtered = allProducts.filter(p => p.category === currentCategory);
+            filtered.sort((a, b) => currentSort === 'asc' ? a.price - b.price : b.price - a.price);
+            
+            filtered.forEach(p => {
                 const div = document.createElement('div');
                 div.className = 'item-card';
                 div.onclick = () => showProduct(p);
-                div.innerHTML = `
-                    ${cart[p.articul] ? '<div class="selected-mark">✓</div>' : ''}
-                    <img src="${p.photo}">
-                    <div style="font-weight:bold; margin-top:10px;">$ ${parseFloat(p.price).toFixed(2)}</div>
-                    <div style="font-size:11px; color:gray; margin-top:4px;">${p.name}</div>`;
+                div.innerHTML = `<img src="${p.photo}"><div style="font-weight:bold; margin-top:10px;">$ ${parseFloat(p.price).toFixed(2)}</div><div style="font-size:11px; color:gray;">${p.name}</div>`;
                 grid.appendChild(div);
             });
         }
@@ -123,11 +143,6 @@
             document.getElementById('p-art').innerText = "Арт: " + p.articul;
             document.getElementById('p-price').innerText = `$ ${parseFloat(p.price).toFixed(2)}`;
             document.getElementById('p-box').innerText = `Короб (6 пар):\n$ ${(p.price * 6).toFixed(2)}`;
-            
-            const btn = document.getElementById('add-btn');
-            btn.innerText = cart[p.articul] ? `✓ В корзине (${cart[p.articul].boxes})` : "➕ Добавить в предзаказ";
-            btn.style.background = cart[p.articul] ? "#ccc" : "var(--primary)";
-            
             document.getElementById('screen-catalog').style.display = 'none';
             document.getElementById('screen-product').style.display = 'block';
         }
@@ -138,14 +153,13 @@
         }
 
         function addToCart() {
-            if (!currentProduct) return;
             const art = currentProduct.articul;
             if (!cart[art]) {
                 cart[art] = { ...currentProduct, boxes: 1 };
                 saveCart();
                 updateCartBadge();
             }
-            backToCatalog();
+            showCart();
         }
 
         function changeQty(art, delta) {
@@ -158,7 +172,7 @@
             }
         }
 
-        function saveCart() { localStorage.setItem('scout_cart_v4', JSON.stringify(cart)); }
+        function saveCart() { localStorage.setItem('scout_cart_v5', JSON.stringify(cart)); }
 
         function updateCartBadge() {
             const count = Object.keys(cart).length;
@@ -173,69 +187,65 @@
             let totalPairs = 0;
             const items = Object.values(cart);
 
-            if (items.length === 0) {
-                container.innerHTML = '<p style="text-align:center; color:gray; margin-top:30px;">Корзина пуста</p>';
-                document.getElementById('cart-total').innerText = '';
-            } else {
-                items.forEach((item) => {
-                    const boxPrice = item.price * 6;
-                    const subTotal = boxPrice * item.boxes;
-                    totalMoney += subTotal;
-                    totalPairs += (item.boxes * 6);
-
-                    container.innerHTML += `
-                        <div class="cart-item">
-                            <img src="${item.photo}">
-                            <div class="cart-info">
-                                <div style="font-weight:bold; font-size:14px;">${item.name}</div>
-                                <div style="font-size:12px; color:gray;">Арт: ${item.articul}</div>
-                                <div class="cart-controls">
-                                    <button class="qty-btn" onclick="changeQty('${item.articul}', -1)">-</button>
-                                    <span class="qty-num">${item.boxes}</span>
-                                    <button class="qty-btn" onclick="changeQty('${item.articul}', 1)">+</button>
-                                    <span style="margin-left:auto; font-weight:bold;">$ ${subTotal.toFixed(2)}</span>
-                                </div>
+            items.forEach((item) => {
+                const subTotal = (item.price * 6) * item.boxes;
+                totalMoney += subTotal;
+                totalPairs += (item.boxes * 6);
+                container.innerHTML += `
+                    <div class="cart-item">
+                        <img src="${item.photo}">
+                        <div class="cart-info">
+                            <div style="font-weight:bold; font-size:14px;">${item.name}</div>
+                            <div style="font-size:12px; color:gray;">Арт: ${item.articul} | $ ${(item.price * 6).toFixed(2)} кор.</div>
+                            <div class="cart-controls">
+                                <button class="qty-btn" onclick="changeQty('${item.articul}', -1)">-</button>
+                                <span class="qty-num">${item.boxes}</span>
+                                <button class="qty-btn" onclick="changeQty('${item.articul}', 1)">+</button>
+                                <span style="margin-left:auto; font-weight:bold;">$ ${subTotal.toFixed(2)}</span>
                             </div>
-                        </div>`;
-                });
-                document.getElementById('cart-total').innerHTML = `Всего: ${totalPairs} пар<br>Сумма: $ ${totalMoney.toFixed(2)}`;
-            }
+                        </div>
+                    </div>`;
+            });
+            document.getElementById('cart-total').innerHTML = `Всего: ${totalPairs} пар<br>Итого: $ ${totalMoney.toFixed(2)}`;
             document.getElementById('screen-cart').style.display = 'block';
+            document.getElementById('main-content').style.display = 'none';
         }
 
-        function closeCart() { document.getElementById('screen-cart').style.display = 'none'; }
+        function closeCart() { 
+            document.getElementById('screen-cart').style.display = 'none'; 
+            document.getElementById('main-content').style.display = 'block';
+        }
 
         function confirmOrder() {
             const items = Object.values(cart);
             if (items.length === 0) return;
             
             let totalMoney = 0;
-            let totalPairs = 0;
-            
             const finalItems = items.map(i => {
-                const itemTotal = (i.price * 6 * i.boxes);
-                totalMoney += itemTotal;
-                totalPairs += (i.boxes * 6);
+                const boxPrice = (i.price * 6);
+                const sum = (boxPrice * i.boxes);
+                totalMoney += sum;
                 return {
                     name: i.name,
                     articul: i.articul,
-                    quantity: i.boxes, // Дублируем для универсальности
-                    boxes: i.boxes,    // Явное указание коробов
-                    total_price: itemTotal.toFixed(2)
+                    quantity: i.boxes,      // Основное поле для бота
+                    boxes: i.boxes,         // Запасное поле
+                    count: i.boxes,         // Еще одно запасное
+                    price: boxPrice.toFixed(2), // Цена ЗА КОРОБ
+                    total: sum.toFixed(2)
                 };
             });
 
-            tg.sendData(JSON.stringify({ 
-                items: finalItems, 
+            tg.sendData(JSON.stringify({
+                items: finalItems,
                 total_amount: totalMoney.toFixed(2),
-                total_pairs: totalPairs
+                total_items_count: items.reduce((a, b) => a + b.boxes, 0)
             }));
             
             cart = {};
-            localStorage.removeItem('scout_cart_v4');
+            localStorage.removeItem('scout_cart_v5');
             tg.close();
         }
-
         init();
     </script>
 </body>
