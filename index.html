@@ -88,7 +88,7 @@
         tg.expand();
         
         let allProducts = [];
-        let cart = JSON.parse(localStorage.getItem('scout_cart_v10') || '{}');
+        let cart = JSON.parse(localStorage.getItem('scout_cart_v11') || '{}');
         let currentCategory = '';
         let currentSort = 'asc';
 
@@ -172,7 +172,7 @@
             }
         }
 
-        function saveCart() { localStorage.setItem('scout_cart_v10', JSON.stringify(cart)); }
+        function saveCart() { localStorage.setItem('scout_cart_v11', JSON.stringify(cart)); }
 
         function updateCartBadge() {
             const count = Object.keys(cart).length;
@@ -222,34 +222,28 @@
             
             let grandTotal = 0;
             const finalItems = items.map(i => {
-                const boxPrice = parseFloat(i.price) * 6;
-                const rowTotal = boxPrice * i.boxes;
-                grandTotal += rowTotal;
+                const totalItemSum = (parseFloat(i.price) * 6 * i.boxes).toFixed(2);
+                grandTotal += parseFloat(totalItemSum);
                 
                 return {
-                    name: i.name,
+                    name: `${i.name} (Арт: ${i.articul})`,
                     articul: i.articul,
                     photo: i.photo,
-                    // ВСЕ ВОЗМОЖНЫЕ ПОЛЯ ДЛЯ БОТА:
-                    price: boxPrice.toFixed(2),
-                    quantity: i.boxes,
-                    count: i.boxes,
+                    // ГЛАВНОЕ: Передаем СУММУ за все короба в поле цены
+                    price: totalItemSum, 
+                    quantity: i.boxes, 
                     amount: i.boxes,
-                    boxes: i.boxes,
-                    total: rowTotal.toFixed(2),
-                    // Готовая текстовая строка для PDF (подстраховка)
-                    description: `Количество: ${i.boxes} коробов (${i.boxes * 6} пар)`
+                    total: totalItemSum
                 };
             });
 
             tg.sendData(JSON.stringify({
                 items: finalItems,
-                total_price: grandTotal.toFixed(2),
-                total_amount: grandTotal.toFixed(2)
+                total_price: grandTotal.toFixed(2)
             }));
             
             cart = {};
-            localStorage.removeItem('scout_cart_v10');
+            localStorage.removeItem('scout_cart_v11');
             tg.close();
         }
         init();
