@@ -88,7 +88,7 @@
         tg.expand();
         
         let allProducts = [];
-        let cart = JSON.parse(localStorage.getItem('scout_cart_v5') || '{}');
+        let cart = JSON.parse(localStorage.getItem('scout_cart_v6') || '{}');
         let currentCategory = '';
         let currentSort = 'asc';
 
@@ -172,7 +172,7 @@
             }
         }
 
-        function saveCart() { localStorage.setItem('scout_cart_v5', JSON.stringify(cart)); }
+        function saveCart() { localStorage.setItem('scout_cart_v6', JSON.stringify(cart)); }
 
         function updateCartBadge() {
             const count = Object.keys(cart).length;
@@ -228,10 +228,10 @@
                 return {
                     name: i.name,
                     articul: i.articul,
-                    quantity: i.boxes,      // Основное поле для бота
-                    boxes: i.boxes,         // Запасное поле
-                    count: i.boxes,         // Еще одно запасное
-                    price: boxPrice.toFixed(2), // Цена ЗА КОРОБ
+                    photo: i.photo,         // Добавлено фото для PDF
+                    quantity: i.boxes,      // Кол-во коробов
+                    boxes: i.boxes,
+                    price: boxPrice.toFixed(2),
                     total: sum.toFixed(2)
                 };
             });
@@ -243,7 +243,7 @@
             }));
             
             cart = {};
-            localStorage.removeItem('scout_cart_v5');
+            localStorage.removeItem('scout_cart_v6');
             tg.close();
         }
         init();
