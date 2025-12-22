@@ -88,7 +88,7 @@
         tg.expand();
         
         let allProducts = [];
-        let cart = JSON.parse(localStorage.getItem('scout_cart_v6') || '{}');
+        let cart = JSON.parse(localStorage.getItem('scout_cart_v7') || '{}');
         let currentCategory = '';
         let currentSort = 'asc';
 
@@ -172,7 +172,7 @@
             }
         }
 
-        function saveCart() { localStorage.setItem('scout_cart_v6', JSON.stringify(cart)); }
+        function saveCart() { localStorage.setItem('scout_cart_v7', JSON.stringify(cart)); }
 
         function updateCartBadge() {
             const count = Object.keys(cart).length;
@@ -221,29 +221,41 @@
             if (items.length === 0) return;
             
             let totalMoney = 0;
+            let totalBoxesCount = 0;
+            
             const finalItems = items.map(i => {
                 const boxPrice = (i.price * 6);
                 const sum = (boxPrice * i.boxes);
                 totalMoney += sum;
+                totalBoxesCount += i.boxes;
+                
                 return {
                     name: i.name,
                     articul: i.articul,
-                    photo: i.photo,         // Добавлено фото для PDF
-                    quantity: i.boxes,      // Кол-во коробов
+                    photo: i.photo,
+                    // Максимальное покрытие для бота:
+                    quantity: i.boxes,
                     boxes: i.boxes,
+                    qnt: i.boxes,
+                    amount: i.boxes,
+                    count: i.boxes,
+                    // Цены:
                     price: boxPrice.toFixed(2),
                     total: sum.toFixed(2)
                 };
             });
 
+            // Отправляем объект с явным указанием итогов
             tg.sendData(JSON.stringify({
                 items: finalItems,
                 total_amount: totalMoney.toFixed(2),
-                total_items_count: items.reduce((a, b) => a + b.boxes, 0)
+                total_boxes: totalBoxesCount,
+                total_quantity: totalBoxesCount,
+                order_summary: `Заказ на ${totalBoxesCount} коробов, сумма: $${totalMoney.toFixed(2)}`
             }));
             
             cart = {};
-            localStorage.removeItem('scout_cart_v6');
+            localStorage.removeItem('scout_cart_v7');
             tg.close();
         }
         init();
