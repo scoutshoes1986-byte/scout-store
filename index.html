@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Scout Store</title>
+    <title>Scout Store Invoice System</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { --tg-theme-bg-color: #f0f2f5; --primary: #0088cc; --success: #2ecc71; }
@@ -80,7 +80,7 @@
         <h3>Ваш предзаказ</h3>
         <div id="cart-items"></div>
         <div id="cart-total" style="margin-top:20px; font-weight:bold; font-size:18px; text-align:right; border-top: 2px solid #eee; padding-top:10px;"></div>
-        <button class="btn btn-confirm" onclick="confirmOrder()">✅ Подтвердить и отправить</button>
+        <button class="btn btn-confirm" onclick="confirmOrder()">✅ Оформить чек (Invoice)</button>
     </div>
 
     <script>
@@ -88,7 +88,7 @@
         tg.expand();
         
         let allProducts = [];
-        let cart = JSON.parse(localStorage.getItem('scout_cart_v11') || '{}');
+        let cart = JSON.parse(localStorage.getItem('scout_cart_v13') || '{}');
         let currentCategory = '';
         let currentSort = 'asc';
 
@@ -172,7 +172,7 @@
             }
         }
 
-        function saveCart() { localStorage.setItem('scout_cart_v11', JSON.stringify(cart)); }
+        function saveCart() { localStorage.setItem('scout_cart_v13', JSON.stringify(cart)); }
 
         function updateCartBadge() {
             const count = Object.keys(cart).length;
@@ -184,19 +184,17 @@
             const container = document.getElementById('cart-items');
             container.innerHTML = '';
             let totalMoney = 0;
-            let totalPairs = 0;
             const items = Object.values(cart);
 
             items.forEach((item) => {
                 const subTotal = (item.price * 6) * item.boxes;
                 totalMoney += subTotal;
-                totalPairs += (item.boxes * 6);
                 container.innerHTML += `
                     <div class="cart-item">
                         <img src="${item.photo}">
                         <div class="cart-info">
                             <div style="font-weight:bold; font-size:14px;">${item.name}</div>
-                            <div style="font-size:12px; color:gray;">Арт: ${item.articul} | $ ${(item.price * 6).toFixed(2)} кор.</div>
+                            <div style="font-size:12px; color:gray;">Арт: ${item.articul}</div>
                             <div class="cart-controls">
                                 <button class="qty-btn" onclick="changeQty('${item.articul}', -1)">-</button>
                                 <span class="qty-num">${item.boxes}</span>
@@ -206,7 +204,7 @@
                         </div>
                     </div>`;
             });
-            document.getElementById('cart-total').innerHTML = `Всего: ${totalPairs} пар<br>Итого: $ ${totalMoney.toFixed(2)}`;
+            document.getElementById('cart-total').innerHTML = `Итого: $ ${totalMoney.toFixed(2)}`;
             document.getElementById('screen-cart').style.display = 'block';
             document.getElementById('main-content').style.display = 'none';
         }
@@ -220,30 +218,31 @@
             const items = Object.values(cart);
             if (items.length === 0) return;
             
-            let grandTotal = 0;
-            const finalItems = items.map(i => {
-                const totalItemSum = (parseFloat(i.price) * 6 * i.boxes).toFixed(2);
-                grandTotal += parseFloat(totalItemSum);
-                
-                return {
-                    name: `${i.name} (Арт: ${i.articul})`,
-                    articul: i.articul,
-                    photo: i.photo,
-                    // ГЛАВНОЕ: Передаем СУММУ за все короба в поле цены
-                    price: totalItemSum, 
-                    quantity: i.boxes, 
-                    amount: i.boxes,
-                    total: totalItemSum
-                };
-            });
-
-            tg.sendData(JSON.stringify({
-                items: finalItems,
-                total_price: grandTotal.toFixed(2)
+            // Формируем структуру LabeledPrice для Invoice
+            const prices = items.map(i => ({
+                label: `${i.name} (x${i.boxes} кор.)`,
+                amount: Math.round(parseFloat(i.price) * 6 * i.boxes * 100) // В центах для Telegram
             }));
+
+            // Также передаем метаданные для генерации PDF ботом
+            const orderPayload = {
+                invoice_mode: true,
+                currency: "USD",
+                prices: prices,
+                products: items.map(i => ({
+                    articul: i.articul,
+                    name: i.name,
+                    qty: i.boxes,
+                    price_box: (i.price * 6).toFixed(2),
+                    total: (i.price * 6 * i.boxes).toFixed(2),
+                    photo: i.photo
+                }))
+            };
+
+            tg.sendData(JSON.stringify(orderPayload));
             
             cart = {};
-            localStorage.removeItem('scout_cart_v11');
+            localStorage.removeItem('scout_cart_v13');
             tg.close();
         }
         init();
