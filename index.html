@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Scout Store v20</title>
+    <title>Scout Store v21</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { --tg-theme-bg-color: #f0f2f5; --primary: #0088cc; --success: #2ecc71; }
@@ -34,13 +34,15 @@
     <div id="main-content">
         <div id="screen-main">
             <h2 style="text-align:center;">SCOUT STORE</h2>
-            <div class="cat-card" onclick="openCatalog('male')">МУЖСКАЯ ОБУВЬ</div>
-            <div class="cat-card" onclick="openCatalog('female')">ЖЕНСКАЯ ОБУВЬ</div>
+            <div class="cat-card" onclick="openCatalog('male')">👟 МУЖСКАЯ ОБУВЬ</div>
+            <div class="cat-card" onclick="openCatalog('female')">👠 ЖЕНСКАЯ ОБУВЬ</div>
         </div>
+
         <div id="screen-catalog" style="display:none;">
-            <div class="nav" onclick="showMain()">⬅ Назад</div>
+            <div class="nav" onclick="showMain()">⬅ К категориям</div>
             <div id="catalog-grid" class="grid"></div>
         </div>
+
         <div id="screen-product" style="display:none;">
             <div class="nav" onclick="backToCatalog()">⬅ В каталог</div>
             <img id="p-img" style="width:100%; border-radius:15px;">
@@ -53,17 +55,19 @@
 
     <div id="screen-cart">
         <div class="nav" onclick="closeCart()">⬅ К покупкам</div>
-        <h3>Ваш заказ</h3>
+        <h3>Ваш предзаказ</h3>
         <div id="cart-items"></div>
         <div id="cart-total" style="margin-top:20px; font-weight:bold; font-size:18px; text-align:right;"></div>
-        <button class="btn btn-confirm" onclick="confirmOrder()">✅ Подтвердить</button>
+        <button class="btn btn-confirm" onclick="confirmOrder()">✅ Подтвердить заказ</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
         let allProducts = [];
-        let cart = JSON.parse(localStorage.getItem('scout_v20') || '{}');
+        let cart = JSON.parse(localStorage.getItem('scout_v21_store') || '{}');
+        let currentCategory = '';
+        let currentProduct = null;
 
         async function init() {
             try {
@@ -76,11 +80,18 @@
         }
 
         function openCatalog(cat) {
+            currentCategory = cat;
             document.getElementById('screen-main').style.display = 'none';
             document.getElementById('screen-catalog').style.display = 'block';
+            renderItems();
+        }
+
+        function renderItems() {
             const grid = document.getElementById('catalog-grid');
             grid.innerHTML = '';
-            allProducts.filter(p => p.category === cat).forEach(p => {
+            // Фильтрация по категории из JSON
+            const filtered = allProducts.filter(p => p.category === currentCategory);
+            filtered.forEach(p => {
                 const div = document.createElement('div');
                 div.className = 'item-card';
                 div.onclick = () => showProduct(p);
@@ -129,7 +140,7 @@
             }
         }
 
-        function saveCart() { localStorage.setItem('scout_v20', JSON.stringify(cart)); }
+        function saveCart() { localStorage.setItem('scout_v21_store', JSON.stringify(cart)); }
 
         function updateCartBadge() {
             const count = Object.keys(cart).length;
@@ -169,17 +180,32 @@
         }
 
         function confirmOrder() {
-            // ВАЖНО: Мы НЕ используем tg.sendData().
-            // Бот ничего не отправит в чат.
+            const items = Object.values(cart);
+            if (items.length === 0) return;
             
-            tg.showConfirm("Подтвердить заказ без отправки сообщения?", (ok) => {
-                if (ok) {
-                    // Здесь можно добавить fetch('твой_api_адрес') для тихой записи в базу
-                    cart = {};
-                    localStorage.removeItem('scout_v20');
-                    tg.close(); // Просто закрываем приложение
-                }
+            let totalSum = 0;
+            const finalOrder = items.map(i => {
+                const totalPosition = i.price * 6 * i.boxes;
+                totalSum += totalPosition;
+                return {
+                    art: i.articul,
+                    name: i.name,
+                    img: i.photo,
+                    boxes: i.boxes,
+                    pairs: i.boxes * 6,
+                    sum: totalPosition.toFixed(2)
+                };
             });
+
+            // Отправляем чистые данные. PDF не будет, если ты не включил его в самом боте.
+            tg.sendData(JSON.stringify({
+                order: finalOrder,
+                total: totalSum.toFixed(2)
+            }));
+            
+            cart = {};
+            localStorage.removeItem('scout_v21_store');
+            tg.close();
         }
         init();
     </script>
