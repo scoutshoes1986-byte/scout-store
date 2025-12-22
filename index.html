@@ -88,7 +88,7 @@
         tg.expand();
         
         let allProducts = [];
-        let cart = JSON.parse(localStorage.getItem('scout_cart_v9') || '{}');
+        let cart = JSON.parse(localStorage.getItem('scout_cart_v10') || '{}');
         let currentCategory = '';
         let currentSort = 'asc';
 
@@ -172,7 +172,7 @@
             }
         }
 
-        function saveCart() { localStorage.setItem('scout_cart_v9', JSON.stringify(cart)); }
+        function saveCart() { localStorage.setItem('scout_cart_v10', JSON.stringify(cart)); }
 
         function updateCartBadge() {
             const count = Object.keys(cart).length;
@@ -220,24 +220,36 @@
             const items = Object.values(cart);
             if (items.length === 0) return;
             
+            let grandTotal = 0;
             const finalItems = items.map(i => {
-                // ПЕРЕДАЕМ ПАРЫ, А НЕ КОРОБА (для корректного счета бота)
-                const totalPairsForItem = i.boxes * 6;
+                const boxPrice = parseFloat(i.price) * 6;
+                const rowTotal = boxPrice * i.boxes;
+                grandTotal += rowTotal;
+                
                 return {
                     name: i.name,
                     articul: i.articul,
                     photo: i.photo,
-                    price: parseFloat(i.price).toFixed(2), // Цена за 1 пару
-                    quantity: totalPairsForItem            // Общее кол-во пар
+                    // ВСЕ ВОЗМОЖНЫЕ ПОЛЯ ДЛЯ БОТА:
+                    price: boxPrice.toFixed(2),
+                    quantity: i.boxes,
+                    count: i.boxes,
+                    amount: i.boxes,
+                    boxes: i.boxes,
+                    total: rowTotal.toFixed(2),
+                    // Готовая текстовая строка для PDF (подстраховка)
+                    description: `Количество: ${i.boxes} коробов (${i.boxes * 6} пар)`
                 };
             });
 
             tg.sendData(JSON.stringify({
-                items: finalItems
+                items: finalItems,
+                total_price: grandTotal.toFixed(2),
+                total_amount: grandTotal.toFixed(2)
             }));
             
             cart = {};
-            localStorage.removeItem('scout_cart_v9');
+            localStorage.removeItem('scout_cart_v10');
             tg.close();
         }
         init();
