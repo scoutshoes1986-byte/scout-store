@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Scout Store 1.0.8</title>
+    <title>Scout Store 1.1.0</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { --tg-theme-bg-color: #f0f2f5; --primary: #0088cc; --success: #2ecc71; }
@@ -86,11 +86,14 @@
 
         async function init() {
             try {
+                // Загружаем данные. Добавляем v=Date.now() чтобы избежать кэширования старого JSON
                 const res = await fetch('products.json?v=' + Date.now());
                 allProducts = await res.json();
                 document.getElementById('loader-screen').style.display = 'none';
                 document.getElementById('main-content').style.display = 'block';
-            } catch (e) { console.error("Load error"); }
+            } catch (e) { 
+                console.error("Ошибка загрузки данных"); 
+            }
         }
 
         function openCatalog(cat) {
@@ -113,7 +116,6 @@
         function renderItems() {
             const grid = document.getElementById('catalog-grid');
             grid.innerHTML = '';
-            // Фильтрация по category из твоего Excel
             allProducts.filter(p => p.category === currentCategory).forEach(p => {
                 const inCart = cart[p.articul];
                 const div = document.createElement('div');
@@ -135,7 +137,6 @@
             document.getElementById('p-name').innerText = p.name;
             document.getElementById('p-art').innerText = "Арт: " + p.articul;
             document.getElementById('p-price').innerText = `$ ${parseFloat(p.price).toFixed(2)}`;
-            // Расчет: Korob пар в одном ящике за цену price_opt из Excel
             document.getElementById('p-box').innerText = `Короб (${p.Korob} пар):\n$ ${parseFloat(p.price_opt).toFixed(2)}`;
             document.getElementById('screen-catalog').style.display = 'none';
             document.getElementById('screen-product').style.display = 'block';
@@ -171,7 +172,7 @@
             const items = Object.values(cart);
 
             items.forEach((item) => {
-                const itemTotal = item.price_opt * item.boxes;
+                const itemTotal = parseFloat(item.price_opt) * item.boxes;
                 totalMoney += itemTotal;
                 totalPairs += (item.boxes * item.Korob);
                 container.innerHTML += `
@@ -202,15 +203,16 @@
             const items = Object.values(cart);
             if (items.length === 0) return;
             
+            // Формируем данные ТАК, как их ждет бот (с артикулами и фото)
             const finalData = {
                 action: "order",
                 items: items.map(i => ({
-                    art: i.articul,
+                    articul: i.articul, // Важно: используем то же имя, что в JSON
                     name: i.name,
                     boxes: i.boxes,
-                    pairs: i.boxes * i.Korob,
-                    sum: (i.price_opt * i.boxes).toFixed(2),
-                    img: i.photo
+                    pairs_per_box: i.Korob,
+                    price: parseFloat(i.price), // Цена за пару
+                    photo: i.photo
                 }))
             };
             
