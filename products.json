@@ -4,7 +4,7 @@
         "name": "Affinity мужские кроссовки натуральная кожа",
         "articul": "1256-10",
         "price": 32.0,
-        "price_info": 192.0,
+        "price_opt": 192.0,
         "photo": "https://i.ibb.co/rfRCD67S/photo-2025-12-18-18-37-46-3.jpg",
         "link": ""
     },
@@ -13,7 +13,7 @@
         "name": "Affinity мужские кроссовки натуральная кожа",
         "articul": "1256-11",
         "price": 32.0,
-        "price_info": 192.0,
+        "price_opt": 192.0,
         "photo": "https://i.ibb.co/pBtdpqg9/photo-2025-12-18-18-37-44-2.jpg",
         "link": ""
     },
@@ -22,7 +22,7 @@
         "name": "Affinity мужские кроссовки натуральная кожа",
         "articul": "1425-11",
         "price": 31.0,
-        "price_info": 186.0,
+        "price_opt": 186.0,
         "photo": "https://i.ibb.co/2YhVhPKW/photo-2025-12-18-18-42-35-3.jpg",
         "link": ""
     },
@@ -31,7 +31,7 @@
         "name": "Affinity мужские кроссовки натуральная кожа",
         "articul": "1426-32",
         "price": 32.2,
-        "price_info": 193.20000000000002,
+        "price_opt": 193.20000000000002,
         "photo": "https://i.ibb.co/bjDFVKGr/photo-2025-12-18-18-42-35.jpg",
         "link": ""
     },
@@ -40,7 +40,7 @@
         "name": "Affinity мужские кроссовки натуральная кожа",
         "articul": "1501-11",
         "price": 33.2,
-        "price_info": 199.20000000000002,
+        "price_opt": 199.20000000000002,
         "photo": "https://i.ibb.co/0ywfHGzj/photo-2025-12-18-18-46-53.jpg",
         "link": ""
     },
@@ -49,7 +49,7 @@
         "name": "Affinity мужские кроссовки натуральная кожа",
         "articul": "1501-111",
         "price": 33.2,
-        "price_info": 199.20000000000002,
+        "price_opt": 199.20000000000002,
         "photo": "https://i.ibb.co/5xrSbqG3/photo-2025-12-18-18-37-47.jpg",
         "link": ""
     },
@@ -58,7 +58,7 @@
         "name": "Affinity мужские кроссовки натуральная кожа",
         "articul": "1501-27",
         "price": 33.2,
-        "price_info": 199.20000000000002,
+        "price_opt": 199.20000000000002,
         "photo": "https://i.ibb.co/7JZ55Ynf/photo-2025-12-18-18-42-34-3.jpg",
         "link": ""
     },
@@ -67,7 +67,7 @@
         "name": "Affinity мужские кроссовки натуральная кожа",
         "articul": "1503-11",
         "price": 33.8,
-        "price_info": 202.79999999999998,
+        "price_opt": 202.79999999999998,
         "photo": "https://i.ibb.co/1JmKb2v0/photo-2025-12-18-18-42-37-4.jpg",
         "link": ""
     },
@@ -76,7 +76,7 @@
         "name": "Affinity мужские кроссовки натуральная кожа",
         "articul": "1503-111",
         "price": 33.8,
-        "price_info": 202.79999999999998,
+        "price_opt": 202.79999999999998,
         "photo": "https://i.ibb.co/Z6n1KcWW/photo-2025-12-18-18-42-37-2.jpg",
         "link": ""
     },
@@ -85,7 +85,7 @@
         "name": "Affinity мужские кроссовки натуральная кожа",
         "articul": "1503-28",
         "price": 33.8,
-        "price_info": 202.79999999999998,
+        "price_opt": 202.79999999999998,
         "photo": "https://i.ibb.co/7tPnjXRc/photo-2025-12-18-18-42-33-3.jpg",
         "link": ""
     },
@@ -94,7 +94,7 @@
         "name": "Affinity мужские кроссовки натуральная кожа",
         "articul": "1504-11",
         "price": 32.6,
-        "price_info": 195.60000000000002,
+        "price_opt": 195.60000000000002,
         "photo": "https://i.ibb.co/pjBtbRBG/photo-2025-12-18-18-42-34-2.jpg",
         "link": ""
     },
@@ -103,7 +103,7 @@
         "name": "Affinity мужские кроссовки натуральная кожа",
         "articul": "1504-11",
         "price": 32.6,
-        "price_info": 195.60000000000002,
+        "price_opt": 195.60000000000002,
         "photo": "https://i.ibb.co/Qs2wbGL/photo-2025-12-18-18-42-34.jpg",
         "link": ""
     },
@@ -112,7 +112,7 @@
         "name": "Affinity мужские кроссовки натуральная кожа",
         "articul": "1505-11",
         "price": 32.6,
-        "price_info": 195.60000000000002,
+        "price_opt": 195.60000000000002,
         "photo": "https://i.ibb.co/zh6GY9Fd/photo-2025-12-18-18-42-36-2.jpg",
         "link": ""
     },
@@ -121,7 +121,7 @@
         "name": "Affinity мужские кроссовки натуральная кожа",
         "articul": "1505-111",
         "price": 32.6,
-        "price_info": 195.60000000000002,
+        "price_opt": 195.60000000000002,
         "photo": "https://i.ibb.co/Ld1wRVMb/photo-2025-12-18-18-42-37-3.jpg",
         "link": ""
     },
@@ -130,7 +130,7 @@
         "name": "Affinity мужские кроссовки натуральная кожа",
         "articul": "1507-10",
         "price": 32.0,
-        "price_info": 192.0,
+        "price_opt": 192.0,
         "photo": "https://i.ibb.co/rGv2jQHH/photo-2025-12-18-18-37-46-2.jpg",
         "link": ""
     },
@@ -139,7 +139,7 @@
         "name": "Affinity мужские кроссовки натуральная кожа",
         "articul": "1507-11",
         "price": 32.0,
-        "price_info": 192.0,
+        "price_opt": 192.0,
         "photo": "https://i.ibb.co/WWCG3682/photo-2025-12-19-14-56-18.jpg",
         "link": ""
     },
@@ -148,7 +148,7 @@
         "name": "Affinity мужские кроссовки натуральная кожа",
         "articul": "1509-11",
         "price": 32.6,
-        "price_info": 195.60000000000002,
+        "price_opt": 195.60000000000002,
         "photo": "https://i.ibb.co/qYWk2Qgh/photo-2025-12-18-18-37-46.jpg",
         "link": ""
     },
@@ -157,7 +157,7 @@
         "name": "Affinity мужские кроссовки натуральная кожа",
         "articul": "1510-111",
         "price": 32.6,
-        "price_info": 195.60000000000002,
+        "price_opt": 195.60000000000002,
         "photo": "https://i.ibb.co/DD0TJbxm/photo-2025-12-18-18-37-45-3.jpg",
         "link": ""
     },
@@ -166,7 +166,7 @@
         "name": "Affinity мужские кроссовки натуральная кожа",
         "articul": "1510-28",
         "price": 32.6,
-        "price_info": 195.60000000000002,
+        "price_opt": 195.60000000000002,
         "photo": "https://i.ibb.co/0L7Y4RQ/photo-2025-12-18-18-42-35-2.jpg",
         "link": ""
     },
@@ -175,7 +175,7 @@
         "name": "Affinity мужские кроссовки натуральная кожа",
         "articul": "1511-111",
         "price": 33.0,
-        "price_info": 198.0,
+        "price_opt": 198.0,
         "photo": "https://i.ibb.co/qMdzP2xm/photo-2025-12-18-18-37-46-4.jpg",
         "link": ""
     },
@@ -184,7 +184,7 @@
         "name": "Affinity мужские кроссовки натуральная кожа",
         "articul": "1511-28",
         "price": 33.0,
-        "price_info": 198.0,
+        "price_opt": 198.0,
         "photo": "https://i.ibb.co/KzKmnRdq/photo-2025-12-18-18-42-36.jpg",
         "link": ""
     },
@@ -193,7 +193,7 @@
         "name": "Affinity мужские кроссовки натуральная кожа",
         "articul": "1514-11",
         "price": 33.2,
-        "price_info": 199.20000000000002,
+        "price_opt": 199.20000000000002,
         "photo": "https://i.ibb.co/GQNd8dvS/photo-2025-12-18-18-42-36-3.jpg",
         "link": ""
     },
@@ -202,7 +202,7 @@
         "name": "Affinity мужские кроссовки натуральная кожа",
         "articul": "1520-11",
         "price": 31.0,
-        "price_info": 186.0,
+        "price_opt": 186.0,
         "photo": "https://i.ibb.co/pHkVyCs/photo-2025-12-18-18-42-32.jpg",
         "link": ""
     },
@@ -211,7 +211,7 @@
         "name": "Affinity мужские кроссовки натуральная кожа",
         "articul": "1521-11",
         "price": 31.0,
-        "price_info": 186.0,
+        "price_opt": 186.0,
         "photo": "https://i.ibb.co/tMRm6Bvr/photo-2025-12-18-18-42-33-2.jpg",
         "link": ""
     },
@@ -220,7 +220,7 @@
         "name": "Affinity мужские кроссовки натуральная кожа",
         "articul": "1525-11",
         "price": 32.7,
-        "price_info": 196.20000000000002,
+        "price_opt": 196.20000000000002,
         "photo": "https://i.ibb.co/XkkbBpKn/photo-2025-12-18-18-42-33.jpg",
         "link": ""
     },
@@ -229,7 +229,7 @@
         "name": "Affinity мужские кроссовки натуральная кожа",
         "articul": "1551-111",
         "price": 33.0,
-        "price_info": 198.0,
+        "price_opt": 198.0,
         "photo": "https://i.ibb.co/Kkky5xy/photo-2025-12-18-18-37-45-2.jpg",
         "link": ""
     },
@@ -238,7 +238,7 @@
         "name": "Affinity мужские кроссовки натуральная кожа",
         "articul": "1601-111",
         "price": 33.0,
-        "price_info": 198.0,
+        "price_opt": 198.0,
         "photo": "https://i.ibb.co/v6VDwkfH/photo-2025-12-18-18-37-44.jpg",
         "link": ""
     },
@@ -247,7 +247,7 @@
         "name": "Affinity мужские кроссовки натуральная кожа",
         "articul": "1918-11",
         "price": 31.0,
-        "price_info": 186.0,
+        "price_opt": 186.0,
         "photo": "https://i.ibb.co/0VZTNZxY/photo-2025-12-19-15-00-00.jpg",
         "link": ""
     },
@@ -256,7 +256,7 @@
         "name": "Affinity мужские кроссовки натуральная кожа",
         "articul": "1402-11",
         "price": 33.0,
-        "price_info": 198.0,
+        "price_opt": 198.0,
         "photo": "https://i.ibb.co/4nQdsSkY/photo-2025-12-19-14-59-51.jpg",
         "link": ""
     }
