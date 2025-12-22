@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Scout Store v17</title>
+    <title>Scout Store v20</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { --tg-theme-bg-color: #f0f2f5; --primary: #0088cc; --success: #2ecc71; }
@@ -56,15 +56,14 @@
         <h3>Ваш заказ</h3>
         <div id="cart-items"></div>
         <div id="cart-total" style="margin-top:20px; font-weight:bold; font-size:18px; text-align:right;"></div>
-        <button class="btn btn-confirm" onclick="confirmOrder()">✅ Оформить предзаказ</button>
+        <button class="btn btn-confirm" onclick="confirmOrder()">✅ Подтвердить</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
         let allProducts = [];
-        let cart = JSON.parse(localStorage.getItem('scout_v17_storage') || '{}');
-        let currentCategory = '';
+        let cart = JSON.parse(localStorage.getItem('scout_v20') || '{}');
 
         async function init() {
             try {
@@ -77,16 +76,11 @@
         }
 
         function openCatalog(cat) {
-            currentCategory = cat;
             document.getElementById('screen-main').style.display = 'none';
             document.getElementById('screen-catalog').style.display = 'block';
-            renderItems();
-        }
-
-        function renderItems() {
             const grid = document.getElementById('catalog-grid');
             grid.innerHTML = '';
-            allProducts.filter(p => p.category === currentCategory).forEach(p => {
+            allProducts.filter(p => p.category === cat).forEach(p => {
                 const div = document.createElement('div');
                 div.className = 'item-card';
                 div.onclick = () => showProduct(p);
@@ -135,7 +129,7 @@
             }
         }
 
-        function saveCart() { localStorage.setItem('scout_v17_storage', JSON.stringify(cart)); }
+        function saveCart() { localStorage.setItem('scout_v20', JSON.stringify(cart)); }
 
         function updateCartBadge() {
             const count = Object.keys(cart).length;
@@ -175,36 +169,17 @@
         }
 
         function confirmOrder() {
-            const items = Object.values(cart);
-            if (items.length === 0) return;
+            // ВАЖНО: Мы НЕ используем tg.sendData().
+            // Бот ничего не отправит в чат.
             
-            let totalSum = 0;
-            const finalItems = items.map(i => {
-                const boxPrice = i.price * 6;
-                const itemTotal = boxPrice * i.boxes;
-                totalSum += itemTotal;
-                
-                return {
-                    articul: i.articul,
-                    name: i.name,
-                    photo: i.photo,
-                    boxes: i.boxes,           // Короба
-                    pairs: i.boxes * 6,       // Пары
-                    price_per_box: boxPrice.toFixed(2),
-                    total_price: itemTotal.toFixed(2)
-                };
+            tg.showConfirm("Подтвердить заказ без отправки сообщения?", (ok) => {
+                if (ok) {
+                    // Здесь можно добавить fetch('твой_api_адрес') для тихой записи в базу
+                    cart = {};
+                    localStorage.removeItem('scout_v20');
+                    tg.close(); // Просто закрываем приложение
+                }
             });
-
-            // Отправляем объект с полным набором данных
-            tg.sendData(JSON.stringify({
-                items: finalItems,
-                grand_total: totalSum.toFixed(2),
-                currency: "USD"
-            }));
-            
-            cart = {};
-            localStorage.removeItem('scout_v17_storage');
-            tg.close();
         }
         init();
     </script>
